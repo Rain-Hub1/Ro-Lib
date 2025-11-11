@@ -14,8 +14,10 @@ function RoLib:new(className, properties)
     return inst
 end
 
-function RoLib:_CreateDropdown(parent, config, theme)
+function RoLib:_CreateDropdown(parent, config, theme, searchFrame)
     local isOpen = false
+    local selectedOption = {Name = nil, Url = nil}
+
     local mainFrame = self:new("Frame", {
         Name = "Dropdown",
         Size = UDim2.new(1, 0, 0, 35),
@@ -31,13 +33,13 @@ function RoLib:_CreateDropdown(parent, config, theme)
         Size = UDim2.new(1, -35, 1, 0),
         BackgroundTransparency = 1,
         Font = Enum.Font.SourceSans,
-        Text = "Copy Link",
+        Text = "Select a Link",
         TextColor3 = theme.MutedText,
         TextSize = 14,
         Parent = mainFrame
     })
 
-    local separator = self:new("Frame", {
+    self:new("Frame", {
         Name = "Separator",
         Size = UDim2.new(0, 1, 0.6, 0),
         Position = UDim2.new(1, -35, 0.5, 0),
@@ -65,14 +67,11 @@ function RoLib:_CreateDropdown(parent, config, theme)
         BackgroundColor3 = theme.Primary,
         BorderSizePixel = 0,
         ClipsDescendants = true,
+        ZIndex = 2,
         Parent = mainFrame
     })
     self:new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = dropdownBody })
-    self:new("UIListLayout", {
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 5),
-        Parent = dropdownBody
-    })
+    self:new("UIListLayout", { SortOrder = Enum.SortOrder.LayoutOrder, Padding = UDim.new(0, 5), Parent = dropdownBody })
 
     local totalHeight = 0
     for name, url in pairs(config.Url or {}) do
@@ -90,33 +89,36 @@ function RoLib:_CreateDropdown(parent, config, theme)
             Parent = dropdownBody
         })
         optionButton.MouseButton1Click:Connect(function()
-            setclipboard(url)
-            copyLabel.Text = name .. " Copied!"
-            task.wait(2)
-            copyLabel.Text = "Copy Link"
+            selectedOption.Name = name
+            selectedOption.Url = url
+            copyLabel.Text = name
+            copyLabel.TextColor3 = theme.Text
+            isOpen = true 
+            arrowButton.MouseButton1Click:Fire() 
         end)
     end
 
-    local openInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local closeInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tweenInfo = TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
     
     arrowButton.MouseButton1Click:Connect(function()
         isOpen = not isOpen
-        local arrowTween = TweenService:Create(arrowButton, openInfo, {Rotation = isOpen and 180 or 0})
-        arrowTween:Play()
+        if isOpen and searchFrame.Visible == false then
+            searchFrame.Visible = true
+            local fadeTween = TweenService:Create(searchFrame, tweenInfo, {BackgroundTransparency = 1})
+            fadeTween:Play()
+        end
         
-        local bodyTween = TweenService:Create(dropdownBody, openInfo, {Size = isOpen and UDim2.new(1, 0, 0, totalHeight + 5) or UDim2.new(1, 0, 0, 0)})
-        bodyTween:Play()
+        TweenService:Create(arrowButton, tweenInfo, {Rotation = isOpen and 180 or 0}):Play()
+        TweenService:Create(dropdownBody, tweenInfo, {Size = isOpen and UDim2.new(1, 0, 0, totalHeight + 5) or UDim2.new(1, 0, 0, 0)}):Play()
     end)
 
     copyLabel.InputBegan:Connect(function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            local firstUrl = next(config.Url)
-            if firstUrl then
-                setclipboard(firstUrl)
-                copyLabel.Text = "Default Link Copied!"
+            if selectedOption.Url then
+                setclipboard(selectedOption.Url)
+                copyLabel.Text = selectedOption.Name .. " Copied!"
                 task.wait(2)
-                copyLabel.Text = "Copy Link"
+                copyLabel.Text = selectedOption.Name
             end
         end
     end)
@@ -128,22 +130,9 @@ function RoLib:_CreateSearch(parent, theme)
         Name = "SearchFrame",
         Size = UDim2.new(1, 0, 0, 35),
         BackgroundTransparency = 1,
+        Visible = false,
         Parent = parent
     })
-
-    local searchBox = self:new("TextBox", {
-        Name = "SearchBox",
-        Size = UDim2.new(1, -45, 1, 0),
-        Position = UDim2.new(1, 0, 0, 0),
-        BackgroundColor3 = theme.Primary,
-        PlaceholderText = "Search...",
-        PlaceholderColor3 = theme.MutedText,
-        Font = Enum.Font.SourceSans,
-        TextColor3 = theme.Text,
-        TextSize = 14,
-        Parent = searchFrame
-    })
-    self:new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = searchBox })
 
     local searchButton = self:new("ImageButton", {
         Name = "SearchButton",
@@ -155,27 +144,36 @@ function RoLib:_CreateSearch(parent, theme)
     })
     self:new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = searchButton })
 
+    local searchBox = self:new("TextBox", {
+        Name = "SearchBox",
+        Size = UDim2.new(0, 0, 1, 0),
+        Position = UDim2.new(1, -35, 0, 0),
+        AnchorPoint = Vector2.new(1, 0),
+        BackgroundColor3 = theme.Primary,
+        PlaceholderText = "Search...",
+        PlaceholderColor3 = theme.MutedText,
+        Font = Enum.Font.SourceSans,
+        TextColor3 = theme.Text,
+        TextSize = 14,
+        ClipsDescendants = true,
+        Parent = searchFrame
+    })
+    self:new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = searchBox })
+
     local tweenInfo = TweenInfo.new(0.3, Enum.EasingStyle.Quint, Enum.EasingDirection.Out)
     searchButton.MouseButton1Click:Connect(function()
         isSearchOpen = not isSearchOpen
+        local goalSize = isSearchOpen and UDim2.new(1, -45, 1, 0) or UDim2.new(0, 0, 1, 0)
         local goalPos = isSearchOpen and UDim2.new(0, 0, 0, 0) or UDim2.new(1, -35, 0, 0)
-        local tween = TweenService:Create(searchBox, tweenInfo, {Position = goalPos})
-        tween:Play()
+        TweenService:Create(searchBox, tweenInfo, {Size = goalSize, Position = goalPos}):Play()
     end)
+    return searchFrame
 end
 
 function RoLib:_KeySystem(mainWindow, config)
     local keyConfig = config.KeyS
     local theme = keyConfig.Theme or config.Theme or "Darker"
-    local Colors = {
-        Darker = {
-            Background = Color3.fromRGB(20, 20, 20),
-            Primary = Color3.fromRGB(30, 30, 30),
-            Accent = Color3.fromRGB(80, 80, 255),
-            Text = Color3.fromRGB(255, 255, 255),
-            MutedText = Color3.fromRGB(150, 150, 150)
-        }
-    }
+    local Colors = { Darker = { Background = Color3.fromRGB(20, 20, 20), Primary = Color3.fromRGB(30, 30, 30), Accent = Color3.fromRGB(80, 80, 255), Text = Color3.fromRGB(255, 255, 255), MutedText = Color3.fromRGB(150, 150, 150) } }
     local Theme = Colors[theme]
     mainWindow.Visible = false
     local overlay = self:new("Frame", { Name = "KeyOverlay", Size = UDim2.new(1, 0, 1, 0), BackgroundColor3 = Colors.Darker.Background, BackgroundTransparency = 0.5, Parent = mainWindow.Parent })
@@ -194,8 +192,8 @@ function RoLib:_KeySystem(mainWindow, config)
     local verifyButton = self:new("TextButton", { Name = "VerifyButton", Size = UDim2.new(1, 0, 0, 35), BackgroundColor3 = Theme.Accent, Text = "VERIFY", Font = Enum.Font.SourceSansBold, TextColor3 = Theme.Text, TextSize = 16, Parent = contentFrame })
     self:new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = verifyButton })
 
-    self:_CreateDropdown(contentFrame, keyConfig, Theme)
-    self:_CreateSearch(contentFrame, Theme)
+    local searchFrame = self:_CreateSearch(contentFrame, Theme)
+    self:_CreateDropdown(contentFrame, keyConfig, Theme, searchFrame)
 
     verifyButton.MouseButton1Click:Connect(function()
         local isValid = false
