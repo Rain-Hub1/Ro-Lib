@@ -31,9 +31,9 @@
             }
         }
 
-        const PARSE_APP_ID = window.__APP_ID || 'UVMWj4jbFXFBkSemQKRyT9UXGfLBz7HnAlr53lV8';
-        const PARSE_JS_KEY = window.__JS_KEY || 'K35x8pgg6Zlw8hHgi4lNiRFkjHpiBO1gJYI2VcPF';
-        const GEMINI_API_KEY = window.__GEMINI_API_KEY || 'AIzaSyB7ou_FpcqAcb21dv5BKoXZl_ve2NHhA3I';
+        const PARSE_APP_ID = 'UVMWj4jbFXFBkSemQKR3T9UXGfLBz7HnAlr53lV8';
+        const PARSE_JS_KEY = 'K35x8pgg6Zlw8hHgi4lNiRFkjHpiBO1gJYI2VcPF';
+        const GEMINI_API_KEY = 'AIzaSyB7ou_FpcqAcb21dv5BKoXZl_ve2NHhA3I';
         const PARSE_SERVER_URL = 'https://parseapi.back4app.com/';
 
         Parse.initialize(PARSE_APP_ID, PARSE_JS_KEY);
@@ -56,11 +56,6 @@
         const handleRegister = async (event) => {
             event.preventDefault();
             
-            if (PARSE_APP_ID.includes('YOUR_BACK4APP')) {
-                 displayMessage('errorMessage', "As chaves do Back4App não foram configuradas. Por favor, adicione-as.");
-                 return;
-            }
-
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
