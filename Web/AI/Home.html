@@ -1,0 +1,194 @@
+import React, { useState, useRef } from 'react';
+import { Upload, Copy, Check, Camera } from 'lucide-react';
+
+export default function ColorPicker() {
+  const [image, setImage] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const canvasRef = useRef(null);
+  const imageRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  const handleImageUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImage(event.target.result);
+        setSelectedColor(null);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const openImageSelector = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleImageClick = (e) => {
+    if (!imageRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    const img = imageRef.current;
+    
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    ctx.drawImage(img, 0, 0);
+
+    const rect = img.getBoundingClientRect();
+    const scaleX = img.naturalWidth / rect.width;
+    const scaleY = img.naturalHeight / rect.height;
+    
+    const x = Math.floor((e.clientX - rect.left) * scaleX);
+    const y = Math.floor((e.clientY - rect.top) * scaleY);
+
+    const pixelData = ctx.getImageData(x, y, 1, 1).data;
+    const hex = rgbToHex(pixelData[0], pixelData[1], pixelData[2]);
+    
+    setSelectedColor({
+      hex,
+      rgb: `rgb(${pixelData[0]}, ${pixelData[1]}, ${pixelData[2]})`
+    });
+    setCopied(false);
+  };
+
+  const rgbToHex = (r, g, b) => {
+    return '#' + [r, g, b].map(x => {
+      const hex = x.toString(16);
+      return hex.length === 1 ? '0' + hex : hex;
+    }).join('').toUpperCase();
+  };
+
+  const copyToClipboard = () => {
+    if (selectedColor) {
+      navigator.clipboard.writeText(selectedColor.hex);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-blue-50 p-4 md:p-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-2xl shadow-xl p-6 md:p-8">
+          <h1 className="text-3xl font-bold text-gray-800 mb-2 text-center">
+            Seletor de Cores
+          </h1>
+          <p className="text-gray-600 mb-6 text-center">
+            Selecione uma imagem e clique para extrair cores
+          </p>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={handleImageUpload}
+            className="hidden"
+          />
+
+          {!image ? (
+            <div className="space-y-4">
+              <button
+                onClick={openImageSelector}
+                className="w-full py-6 px-6 bg-purple-600 hover:bg-purple-700 text-white rounded-xl transition-colors font-medium flex items-center justify-center gap-3 shadow-lg"
+              >
+                <Camera className="w-6 h-6" />
+                Selecionar Imagem
+              </button>
+
+              <div className="border-3 border-dashed border-gray-300 rounded-xl p-12 text-center hover:border-purple-400 transition-colors">
+                <label className="cursor-pointer block">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                  <Upload className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+                  <p className="text-lg text-gray-600 mb-2">
+                    Ou arraste uma imagem aqui
+                  </p>
+                  <p className="text-sm text-gray-400">
+                    PNG, JPG ou GIF
+                  </p>
+                </label>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="relative rounded-xl overflow-hidden shadow-lg border-2 border-gray-200">
+                <img
+                  ref={imageRef}
+                  src={image}
+                  alt="Uploaded"
+                  onClick={handleImageClick}
+                  className="w-full cursor-crosshair"
+                />
+                <canvas ref={canvasRef} className="hidden" />
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={openImageSelector}
+                  className="flex-1 py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
+                >
+                  <Camera className="w-5 h-5" />
+                  Nova Imagem
+                </button>
+                <button
+                  onClick={() => setImage(null)}
+                  className="flex-1 py-3 px-4 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors text-gray-700 font-medium"
+                >
+                  Limpar
+                </button>
+              </div>
+
+              {selectedColor && (
+                <div className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 border-2 border-purple-200">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                    Cor Selecionada
+                  </h3>
+                  
+                  <div className="flex items-center gap-4 mb-4">
+                    <div
+                      className="w-20 h-20 rounded-lg shadow-lg border-2 border-white"
+                      style={{ backgroundColor: selectedColor.hex }}
+                    />
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-600 mb-1">HEX</p>
+                      <p className="text-2xl font-mono font-bold text-gray-800">
+                        {selectedColor.hex}
+                      </p>
+                      <p className="text-sm text-gray-600 mt-2">RGB</p>
+                      <p className="text-sm font-mono text-gray-700">
+                        {selectedColor.rgb}
+                      </p>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={copyToClipboard}
+                    className="w-full py-3 px-4 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors font-medium flex items-center justify-center gap-2"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-5 h-5" />
+                        Copiado!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-5 h-5" />
+                        Copiar Código HEX
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
