@@ -33,7 +33,7 @@
 
         .chat-container {
             width: 100%;
-            height: 100vh; 
+            height: 100dvh; /* Usando dvh para melhor compatibilidade mobile */
             max-width: 900px;
             display: flex;
             flex-direction: column;
@@ -45,8 +45,8 @@
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            padding: 8px 20px; /* Mais compacto */
-            height: 55px; /* Altura ajustada */
+            padding: 10px 20px;
+            height: 50px; /* Mais fino e elegante */
             border-bottom: 1px solid #282828;
             flex-shrink: 0;
         }
@@ -120,7 +120,7 @@
         }
 
         .input-area {
-            padding: 10px 20px; /* Mais compacto */
+            padding: 10px 15px; /* Padding menor */
             background-color: var(--bg-color);
             border-top: 1px solid #282828;
             flex-shrink: 0;
@@ -128,11 +128,11 @@
 
         .input-wrapper {
             display: flex;
-            align-items: flex-end;
+            align-items: center; /* Centraliza itens verticalmente */
             background-color: var(--input-bg);
             border-radius: 25px;
-            padding: 8px 10px;
-            min-height: 50px;
+            padding: 4px 10px; /* Padding interno menor para ser mais compacto */
+            min-height: 40px; /* Altura mínima para compactação */
         }
 
         .input-wrapper input {
@@ -140,13 +140,12 @@
             background: none;
             border: none;
             color: var(--text-color);
-            padding: 10px 15px; /* Aumentei o padding para melhor alinhamento */
+            padding: 8px 10px; 
             font-size: clamp(0.9rem, 2.5vw, 1rem);
             outline: none;
             resize: none;
             overflow: hidden;
             line-height: 1.4;
-            min-height: 20px;
         }
 
         .input-wrapper input::placeholder {
@@ -158,9 +157,9 @@
             background-color: var(--send-bg);
             border: none;
             border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            min-width: 35px;
+            width: 30px; /* Botão menor */
+            height: 30px; /* Botão menor */
+            min-width: 30px;
             display: flex;
             justify-content: center;
             align-items: center;
