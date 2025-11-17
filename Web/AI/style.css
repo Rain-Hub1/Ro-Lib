@@ -1,8 +1,8 @@
 :root {
-    --primary-color: #4CAF50; /* Verde Principal */
-    --secondary-color: #f4f7f6; /* Fundo Leve */
-    --user-bubble: #4CAF50; /* Bolha do Usuário */
-    --assistant-bubble: #e0e0e0; /* Bolha do Assistente */
+    --primary-color: #4CAF50;
+    --secondary-color: #f4f7f6;
+    --user-bubble: #4CAF50;
+    --assistant-bubble: #e0e0e0;
     --text-color: #333;
     --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -15,7 +15,7 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #e9ebee; /* Fundo da Página */
+    background-color: #e9ebee;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -34,7 +34,6 @@ body {
     background-color: #fff;
 }
 
-/* --- Cabeçalho --- */
 .chat-header {
     display: flex;
     justify-content: space-between;
@@ -71,7 +70,6 @@ body {
     opacity: 1;
 }
 
-/* --- Corpo das Mensagens --- */
 .chat-messages {
     flex-grow: 1;
     padding: 20px;
@@ -90,20 +88,18 @@ body {
     position: relative;
 }
 
-/* Estilo para a mensagem do Usuário */
 .user-message {
-    align-self: flex-end; /* Alinha à direita */
+    align-self: flex-end;
     background-color: var(--user-bubble);
     color: white;
-    border-bottom-right-radius: 5px; /* Deixa o canto inferior mais reto */
+    border-bottom-right-radius: 5px;
 }
 
-/* Estilo para a mensagem do Assistente */
 .assistant-message {
-    align-self: flex-start; /* Alinha à esquerda */
+    align-self: flex-start;
     background-color: var(--assistant-bubble);
     color: var(--text-color);
-    border-bottom-left-radius: 5px; /* Deixa o canto inferior mais reto */
+    border-bottom-left-radius: 5px;
 }
 
 .timestamp {
