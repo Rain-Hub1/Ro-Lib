@@ -1,1 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo ao Nosso Site</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        const Fundo = '#161717';
+        const TextboxBg = '#2E2E2F';
+        const TextoNormal = '#BDBDBD';
+        const BotaoBg = '#FFFFFF';
+        const BotaoTexto = '#181918';
+
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fundo': Fundo,
+                        'textbox-bg': TextboxBg,
+                        'texto-normal': TextoNormal,
+                        'botao-bg': BotaoBg,
+                        'botao-texto': BotaoTexto,
+                        'accent-blue': '#3b82f6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                },
+            }
+        }
+    </script>
+</head>
+<body class="bg-fundo min-h-screen flex items-center justify-center p-4 font-sans text-texto-normal">
+    <div class="w-full max-w-xl bg-textbox-bg shadow-2xl shadow-gray-900 rounded-xl p-8 md:p-12 text-center transition-all duration-300 border border-gray-700">
+        <header>
+            <h1 class="text-4xl font-extrabold text-white mb-4">Rain-Hub Chat</h1>
+            <p class="text-lg mb-8">Acesse ou crie sua conta para gerenciar seus chats privados.</p>
+        </header>
+
+        <main class="space-y-4">
+            <a href="Home.html" class="block w-full py-3 px-6 bg-accent-blue text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 transition duration-300">
+                Ir para o Dashboard (Requer Login)
+            </a>
+            <div class="flex flex-col sm:flex-row gap-4">
+                <a href="Login.html" class="flex-1 py-3 px-6 bg-botao-bg text-botao-texto font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300">
+                    Fazer Login
+                </a>
+                <a href="Register.html" class="flex-1 py-3 px-6 bg-botao-bg text-botao-texto font-semibold rounded-lg shadow-md hover:bg-gray-200 transition duration-300">
+                    Registar-se
+                </a>
+            </div>
+        </main>
+
+        <footer class="mt-10 text-sm text-gray-500">
+            <p>&copy; 2025 Projeto Rain-Hub.</p>
+        </footer>
+    </div>
+</body>
+</html>
 
