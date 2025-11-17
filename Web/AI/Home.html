@@ -14,6 +14,8 @@
             --send-bg: #e0e0e0;
             --send-color: #121212;
             --header-icon-color: #bdbdbd;
+            --modal-bg: #2d2d2d;
+            --modal-border: #3a3a3a;
         }
 
         body {
@@ -33,29 +35,44 @@
 
         .chat-container {
             width: 100%;
-            height: 100dvh; /* Usando dvh para melhor compatibilidade mobile */
+            height: 100dvh; 
             max-width: 900px;
             display: flex;
             flex-direction: column;
             position: relative;
             background-color: var(--bg-color);
         }
+        
+        /* FIX TEMPORÁRIO PARA MOBILE (Ativado via JS/Checkbox) */
+        .chat-container.mobile-fix {
+            height: 100vh; /* Reverte para vh, que pode funcionar melhor em alguns casos */
+        }
 
         .header-bar {
             display: flex;
-            justify-content: flex-start;
+            justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            height: 50px; /* Mais fino e elegante */
+            height: 50px;
             border-bottom: 1px solid #282828;
             flex-shrink: 0;
         }
 
-        .header-bar .fa-arrow-left {
+        .header-icons {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header-bar .header-icon {
             font-size: 1.5rem;
             color: var(--header-icon-color);
             cursor: pointer;
             padding: 5px;
+            transition: color 0.2s;
+        }
+
+        .header-bar .header-icon:hover {
+            color: var(--text-color);
         }
 
         .content-area {
@@ -120,7 +137,7 @@
         }
 
         .input-area {
-            padding: 10px 15px; /* Padding menor */
+            padding: 10px 15px;
             background-color: var(--bg-color);
             border-top: 1px solid #282828;
             flex-shrink: 0;
@@ -128,11 +145,11 @@
 
         .input-wrapper {
             display: flex;
-            align-items: center; /* Centraliza itens verticalmente */
+            align-items: center;
             background-color: var(--input-bg);
             border-radius: 25px;
-            padding: 4px 10px; /* Padding interno menor para ser mais compacto */
-            min-height: 40px; /* Altura mínima para compactação */
+            padding: 4px 10px;
+            min-height: 40px;
         }
 
         .input-wrapper input {
@@ -157,8 +174,8 @@
             background-color: var(--send-bg);
             border: none;
             border-radius: 50%;
-            width: 30px; /* Botão menor */
-            height: 30px; /* Botão menor */
+            width: 30px;
+            height: 30px;
             min-width: 30px;
             display: flex;
             justify-content: center;
@@ -180,6 +197,42 @@
             background-color: #c0c0c0;
         }
 
+        /* --- MODAL DE CONFIGURAÇÕES --- */
+        .settings-modal {
+            position: absolute;
+            top: 60px;
+            right: 20px;
+            width: 250px;
+            background-color: var(--modal-bg);
+            border: 1px solid var(--modal-border);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            z-index: 1000;
+            display: none; /* Escondido por padrão */
+        }
+
+        .settings-modal.show {
+            display: block;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--modal-border);
+            color: var(--text-color);
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-item label {
+            font-size: 0.95rem;
+        }
+
         @media (min-width: 600px) {
             .chat-container {
                 border-radius: 12px;
@@ -191,9 +244,12 @@
     </style>
 </head>
 <body>
-    <div class="chat-container">
+    <div class="chat-container" id="chat-container">
         <div class="header-bar">
-            <i class="fas fa-arrow-left"></i>
+            <i class="fas fa-arrow-left header-icon"></i>
+            <div class="header-icons">
+                 <i class="fas fa-cog header-icon" id="settings-toggle"></i>
+            </div>
         </div>
 
         <div class="content-area">
@@ -212,15 +268,32 @@
                 </button>
             </div>
         </div>
+        
+        <div id="settings-modal" class="settings-modal">
+            <div class="setting-item">
+                <label for="mobile-fix-checkbox">Fixar Modo Mobile (100vh)</label>
+                <input type="checkbox" id="mobile-fix-checkbox">
+            </div>
+            <div class="setting-item" style="border-bottom: none;">
+                <label>Versão da UI</label>
+                <span>5.0</span>
+            </div>
+        </div>
+
     </div>
 
     <script>
+        const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('message-input');
         const sendButton = document.getElementById('send-button');
         const messageList = document.getElementById('message-list');
         const contentArea = document.querySelector('.content-area');
         const mainPrompt = document.querySelector('.main-prompt');
+        const settingsToggle = document.getElementById('settings-toggle');
+        const settingsModal = document.getElementById('settings-modal');
+        const mobileFixCheckbox = document.getElementById('mobile-fix-checkbox');
 
+        // --- Funções de Chat ---
         sendButton.addEventListener('click', sendMessage);
         messageInput.addEventListener('input', toggleSendButton);
         messageInput.addEventListener('keypress', function(e) {
@@ -262,11 +335,32 @@
 
             setTimeout(() => {
                 const responseMessage = document.createElement('li');
-                responseMessage.textContent = 'Esta é uma resposta simulada da IA. O design está lindo e responsivo!';
+                responseMessage.textContent = 'Esta é uma resposta simulada da IA. Para testar o Mobile Fix, use o menu de configurações.';
                 messageList.appendChild(responseMessage);
                 contentArea.scrollTop = contentArea.scrollHeight;
             }, 800);
         }
+
+        // --- Funções de Settings ---
+        settingsToggle.addEventListener('click', () => {
+            settingsModal.classList.toggle('show');
+        });
+
+        mobileFixCheckbox.addEventListener('change', (e) => {
+            if (e.target.checked) {
+                chatContainer.classList.add('mobile-fix');
+            } else {
+                chatContainer.classList.remove('mobile-fix');
+            }
+        });
+
+        // Fecha o modal ao clicar fora
+        document.addEventListener('click', (e) => {
+            if (!settingsModal.contains(e.target) && e.target !== settingsToggle) {
+                settingsModal.classList.remove('show');
+            }
+        });
+
 
         window.onload = function() {
             contentArea.scrollTop = contentArea.scrollHeight;
@@ -275,4 +369,12 @@
     </script>
 </body>
 </html>
+```eof
 
+### ⚙️ Como Usar a Nova Configuração:
+
+1.  **Ícone de Settings:** Clique no ícone de engrenagem (`fa-cog`) no canto superior direito.
+2.  **Checkbox "Mobile":** No menu que se abre, você verá a opção **"Fixar Modo Mobile (100vh)"** com uma caixa de seleção.
+3.  **Teste o Fix:**
+    * **Desmarcado (Padrão):** A UI usa `100dvh` (solução moderna, mas inconsistente).
+    * **Marcado:** A UI usa `100vh` tradicional. **Marque e desmarque essa opção em seu celular para ver qual das duas definições de altura funciona melhor** no seu navegador móvel e corrige o "bug" do recorte da tela.
