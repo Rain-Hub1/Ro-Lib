@@ -5,13 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login de Usuário</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        setLogLevel('Debug');
-
+    <script src="https://unpkg.com/parse/dist/parse.min.js"></script>
+    <script>
         const Fundo = '#161717';
         const TextboxBg = '#2E2E2F';
         const TextoNormal = '#BDBDBD';
@@ -36,53 +31,65 @@
             }
         }
 
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const PARSE_APP_ID = window.__APP_ID || 'UVMWj4jbFXFBkSemQKRyT9UXGfLBz7HnAlr53lV8';
+        const PARSE_JS_KEY = window.__JS_KEY || 'K35x8pgg6Zlw8hHgi4lNiRFkjHpiBO1gJYI2VcPF';
+        const GEMINI_API_KEY = window.__GEMINI_API_KEY || 'AIzaSyB7ou_FpcqAcb21dv5BKoXZl_ve2NHhA3I';
+        const PARSE_SERVER_URL = 'https://parseapi.back4app.com/';
 
-        let app;
-        let auth;
+        Parse.initialize(PARSE_APP_ID, PARSE_JS_KEY);
+        Parse.serverURL = PARSE_SERVER_URL;
 
-        try {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            getFirestore(app);
-        } catch (e) {
-            console.error("Erro ao inicializar Firebase:", e);
-        }
+        const displayError = (message) => {
+            const errorElement = document.getElementById('errorMessage');
+            document.getElementById('errorText').textContent = message;
+            errorElement.classList.remove('hidden');
+        };
 
-        async function authenticateAndRedirect() {
-            try {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
-                console.log("Autenticação Firebase concluída.");
-                window.location.href = 'Home.html';
-            } catch (error) {
-                console.error("Erro de autenticação:", error);
-                document.getElementById('errorMessage').classList.remove('hidden');
+        const resetForm = (submitButton) => {
+            submitButton.textContent = 'Entrar';
+            submitButton.disabled = false;
+            submitButton.classList.add('bg-botao-bg');
+            submitButton.classList.remove('bg-gray-500');
+        };
+
+        const handleLogin = async (event) => {
+            event.preventDefault();
+            document.getElementById('errorMessage').classList.add('hidden');
+
+            if (PARSE_APP_ID.includes('YOUR_BACK4APP')) {
+                 displayError("As chaves do Back4App não foram configuradas. Por favor, adicione-as.");
+                 return;
             }
-        }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const loginForm = document.getElementById('loginForm');
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
             const submitButton = document.querySelector('#loginForm button[type="submit"]');
 
-            loginForm.addEventListener('submit', function(event) {
-                event.preventDefault(); 
-                
-                submitButton.textContent = 'Autenticando...';
-                submitButton.disabled = true;
-                submitButton.classList.remove('bg-botao-bg');
-                submitButton.classList.add('bg-gray-500');
-
-                setTimeout(authenticateAndRedirect, 500);
-            });
-            
-            if (auth.currentUser) {
-                window.location.href = 'Home.html';
+            if (!email || !password) {
+                displayError("Preencha todos os campos.");
+                return;
             }
+
+            submitButton.textContent = 'Autenticando...';
+            submitButton.disabled = true;
+            submitButton.classList.remove('bg-botao-bg');
+            submitButton.classList.add('bg-gray-500');
+
+            try {
+                await Parse.User.logIn(email, password);
+                window.location.href = 'Home.html';
+            } catch (error) {
+                displayError(`Falha na autenticação: ${error.message}`);
+                resetForm(submitButton);
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (Parse.User.current()) {
+                window.location.href = 'Home.html';
+                return;
+            }
+            document.getElementById('loginForm').addEventListener('submit', handleLogin);
         });
     </script>
 </head>
@@ -95,13 +102,13 @@
 
         <div id="errorMessage" class="hidden bg-red-900 border border-red-700 text-red-300 px-4 py-3 rounded relative mb-4" role="alert">
             <strong class="font-bold">Erro!</strong>
-            <span class="block sm:inline"> Falha na autenticação.</span>
+            <span id="errorText" class="block sm:inline"></span>
         </div>
 
         <form id="loginForm" class="space-y-4">
             <div>
-                <label for="email" class="block text-sm font-medium mb-1">E-mail</label>
-                <input type="email" id="email" name="email" required placeholder="seu.email@exemplo.com"
+                <label for="email" class="block text-sm font-medium mb-1">E-mail (Username)</label>
+                <input type="text" id="email" name="email" required placeholder="Seu nome de usuário ou e-mail"
                        class="w-full px-3 py-2 border border-gray-600 bg-textbox-bg text-texto-normal rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-red">
             </div>
 
