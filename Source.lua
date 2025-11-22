@@ -2,7 +2,8 @@ local Lib = {}
 
 local LibInfo = {
   Name = "Ro Lib",
-  Version = 1.0
+  Bugs = "No bugs.",
+  Version = "1.0"
 }
 
 function new(c, p)
@@ -47,8 +48,21 @@ function Lib:Window(Info)
   new("UICorner", {
    Parent = Tbar
   })
- 
+  
+  local CloseBtn = new("ImageButton", {
+   Size = UDim2.new(0, 30, 0, 30),
+   Position = UDim2.new(0, 400, 0, 30),
+   Image = "rblxassetid://10747384394",
+   BackgroundColor3 = Color3.fromHex("#fb542b"),
+   Parent = Tbar
+  })
+
+  CloseBtn.MouseButton1Click:Connect(function()
+    s:Destroy()
+  end)
+  
   local Title = Info.Title or "Window"
+  print("Title: " .. Title)
 end
 
 function Lib:Demo()
@@ -59,6 +73,7 @@ end
 
 print(" Library Loaded!")
 print(" <-- Info -->")
-print("  Version: " .. LibInfo.Version)
+print("  Bugs: " .. LibInfo.Bugs)
 print("  Name: " .. LibInfo.Name)
+print("  Version: " .. LibInfo.Version)
 return Lib
