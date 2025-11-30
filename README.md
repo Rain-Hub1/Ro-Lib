@@ -25,3 +25,21 @@ local Tab = Win:Tab({
   Name = "My Tab!"
 })
 ```
+
+## `Label`
+```lua
+local Label = Tab:Label({
+  Name = "My label!"
+})
+```
+
+## `Toggle`
+```lua
+local Toggle = Tab:Toggle({
+  Name = "My toggle",
+  Desc = "On!",
+  Defalth = true,
+  Callback = function(V)
+    print(V)
+  end
+})
