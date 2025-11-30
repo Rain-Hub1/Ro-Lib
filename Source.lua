@@ -706,7 +706,7 @@ function Lib:Window(Info)
   return WinApp
 end
 
-function Demo()
+function Lib:Demo()
   local Win = Lib:Window({
     Title = "Ro Lib Demo Title"
   })
