@@ -781,6 +781,5 @@ function Demo()
   
   Tab1:SelectTab()
 end
-Demo()
 
 return Lib
