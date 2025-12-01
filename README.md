@@ -44,7 +44,7 @@ local Label = Tab:Label({
 })
 ```
 
-## `Button` | New
+## `Button`
 ```lua
 local Button = Tab:Button({
   Name = "My",
@@ -67,7 +67,7 @@ local Toggle = Tab:Toggle({
 })
 ```
 
-## `Dropdown` | New
+## `Dropdown` | Update
 ```lua
 local Dropdown = Tab:Dropdown({
   Name = "My",
