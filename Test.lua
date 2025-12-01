@@ -893,35 +893,18 @@ function Lib:Window(Info)
       
       new("UIPadding", {
         PaddingLeft = UDim.new(0, Theme.Padding),
-        PaddingRight = UDim.new(0, Theme.Padding),
+        PaddingRight = UDim.new(0, Theme.Padding + 50),
         PaddingTop = UDim.new(0, Theme.Padding / 2),
         PaddingBottom = UDim.new(0, Theme.Padding / 2),
         Parent = DropdownFrame
       })
       
-      local MainContainer = new("Frame", {
-        Name = "MainContainer",
+      local TextContainer = new("Frame", {
+        Name = "TextContainer",
         Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundTransparency = 1,
         Parent = DropdownFrame
-      })
-      
-      new("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical,
-        HorizontalAlignment = Enum.HorizontalAlignment.Left,
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 5),
-        Parent = MainContainer
-      })
-      
-      local HeaderContainer = new("Frame", {
-        Name = "HeaderContainer",
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        BackgroundTransparency = 1,
-        LayoutOrder = 1,
-        Parent = MainContainer
       })
       
       new("UIListLayout", {
@@ -929,7 +912,7 @@ function Lib:Window(Info)
         HorizontalAlignment = Enum.HorizontalAlignment.Left,
         SortOrder = Enum.SortOrder.LayoutOrder,
         Padding = UDim.new(0, 2),
-        Parent = HeaderContainer
+        Parent = TextContainer
       })
       
       local DropdownName = new("TextLabel", {
@@ -946,7 +929,7 @@ function Lib:Window(Info)
         Font = Enum.Font.SourceSansSemibold,
         Text = Info.Name or "Dropdown",
         LayoutOrder = 1,
-        Parent = HeaderContainer
+        Parent = TextContainer
       })
       
       local DropdownDesc
@@ -965,49 +948,75 @@ function Lib:Window(Info)
           Font = Enum.Font.SourceSans,
           Text = Info.Desc,
           LayoutOrder = 2,
-          Parent = HeaderContainer
+          Parent = TextContainer
         })
       end
       
-      local SelectionDisplay = new("TextButton", {
-        Name = "SelectionDisplay",
-        Size = UDim2.new(1, 0, 0, 30),
+      local DropdownButton = new("Frame", {
+        Name = "DropdownButton",
+        Size = UDim2.new(0, 44, 0, 23),
+        Position = UDim2.new(1, 8, 0.5, 0),
+        AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = Theme.SecondaryBg,
-        Text = #selectedOptions > 0 and table.concat(selectedOptions, ", ") or "Select...",
-        TextColor3 = Theme.TextColor,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextSize = 13,
-        Font = Enum.Font.SourceSans,
-        LayoutOrder = 2,
-        Parent = MainContainer
+        Parent = DropdownFrame
       })
       
-      new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = SelectionDisplay })
-      new("UIPadding", {
-        PaddingLeft = UDim.new(0, 8),
-        PaddingRight = UDim.new(0, 25),
-        Parent = SelectionDisplay
+      new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = DropdownButton })
+      new("UIStroke", {
+        Color = Theme.BorderColor,
+        Thickness = 1,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+        Parent = DropdownButton
       })
       
-      local Arrow = new("TextLabel", {
-        Size = UDim2.new(0, 20, 0, 20),
-        Position = UDim2.new(1, -25, 0.5, -10),
+      local ArrowIcon = new("ImageLabel", {
+        Name = "ArrowIcon",
+        Size = UDim2.new(0, 16, 0, 16),
+        Position = UDim2.new(0.5, -8, 0.5, -8),
         BackgroundTransparency = 1,
-        Text = "▼",
-        TextColor3 = Theme.TextColor,
-        TextSize = 12,
-        Font = Enum.Font.SourceSans,
-        Parent = SelectionDisplay
+        Image = "rbxassetid://10709768939",
+        ImageColor3 = Theme.TextColor,
+        Parent = DropdownButton
       })
       
-      local OptionsContainer = new("Frame", {
-        Name = "OptionsContainer",
+      local ToggleButton = new("TextButton", {
+        Name = "ToggleButton",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Text = "",
+        Parent = DropdownFrame
+      })
+      
+      local OptionsMenu = new("Frame", {
+        Name = "OptionsMenu",
+        Size = UDim2.new(1, -20, 0, 0),
+        Position = UDim2.new(0, 10, 1, 5),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundColor3 = Theme.SecondaryBg,
+        Visible = false,
+        ZIndex = 10,
+        Parent = DropdownFrame
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = OptionsMenu })
+      new("UIStroke", {
+        Color = Theme.BorderColor,
+        Thickness = Theme.StrokeThickness,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+        Parent = OptionsMenu
+      })
+      
+      local OptionsScroller = new("ScrollingFrame", {
+        Name = "OptionsScroller",
         Size = UDim2.new(1, 0, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundTransparency = 1,
-        Visible = false,
-        LayoutOrder = 3,
-        Parent = MainContainer
+        BorderSizePixel = 0,
+        ScrollBarThickness = 4,
+        CanvasSize = UDim2.new(0, 0, 0, 0),
+        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+        ScrollBarImageColor3 = Theme.AccentColor,
+        Parent = OptionsMenu
       })
       
       new("UIListLayout", {
@@ -1015,18 +1024,25 @@ function Lib:Window(Info)
         HorizontalAlignment = Enum.HorizontalAlignment.Left,
         SortOrder = Enum.SortOrder.LayoutOrder,
         Padding = UDim.new(0, 2),
-        Parent = OptionsContainer
+        Parent = OptionsScroller
+      })
+      
+      new("UIPadding", {
+        PaddingLeft = UDim.new(0, 5),
+        PaddingRight = UDim.new(0, 5),
+        PaddingTop = UDim.new(0, 5),
+        PaddingBottom = UDim.new(0, 5),
+        Parent = OptionsScroller
       })
       
       local isOpen = false
       local currentCallback = Info.Callback
       
-      local function UpdateDisplay()
-        if #selectedOptions > 0 then
-          SelectionDisplay.Text = table.concat(selectedOptions, ", ")
-        else
-          SelectionDisplay.Text = "Select..."
+      local function TruncateText(text, maxLength)
+        if #text > maxLength then
+          return string.sub(text, 1, maxLength) .. "..."
         end
+        return text
       end
       
       local function CreateOption(optionText, index)
@@ -1038,17 +1054,19 @@ function Lib:Window(Info)
           end
         end
         
+        local displayText = TruncateText(optionText, 25)
+        
         local OptionButton = new("TextButton", {
           Name = "Option_" .. index,
           Size = UDim2.new(1, 0, 0, 28),
-          BackgroundColor3 = isSelected and Theme.AccentColor or Theme.SecondaryBg,
-          Text = optionText,
+          BackgroundColor3 = isSelected and Theme.AccentColor or Theme.TertiaryBg,
+          Text = displayText,
           TextColor3 = Theme.TextColor,
           TextXAlignment = Enum.TextXAlignment.Left,
           TextSize = 13,
           Font = Enum.Font.SourceSans,
           LayoutOrder = index,
-          Parent = OptionsContainer
+          Parent = OptionsScroller
         })
         
         new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = OptionButton })
@@ -1065,7 +1083,7 @@ function Lib:Window(Info)
               if selected == optionText then
                 table.remove(selectedOptions, i)
                 found = true
-                OptionButton.BackgroundColor3 = Theme.SecondaryBg
+                OptionButton.BackgroundColor3 = Theme.TertiaryBg
                 break
               end
             end
@@ -1074,19 +1092,19 @@ function Lib:Window(Info)
               OptionButton.BackgroundColor3 = Theme.AccentColor
             end
           else
-            for _, child in pairs(OptionsContainer:GetChildren()) do
+            for _, child in pairs(OptionsScroller:GetChildren()) do
               if child:IsA("TextButton") then
-                child.BackgroundColor3 = Theme.SecondaryBg
+                child.BackgroundColor3 = Theme.TertiaryBg
               end
             end
             selectedOptions = {optionText}
             OptionButton.BackgroundColor3 = Theme.AccentColor
             isOpen = false
-            OptionsContainer.Visible = false
-            TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 0}):Play()
+            OptionsMenu.Visible = false
+            TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
+            TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
           end
           
-          UpdateDisplay()
           if currentCallback then
             pcall(currentCallback, Multi and selectedOptions or selectedOptions[1])
           end
@@ -1094,21 +1112,19 @@ function Lib:Window(Info)
         
         OptionButton.MouseEnter:Connect(function()
           if OptionButton.BackgroundColor3 ~= Theme.AccentColor then
-            TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.PrimaryBg}):Play()
+            TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
           end
         end)
         
         OptionButton.MouseLeave:Connect(function()
-          if OptionButton.BackgroundColor3 ~= Theme.AccentColor then
-            local targetColor = Theme.SecondaryBg
-            for _, selected in ipairs(selectedOptions) do
-              if selected == optionText then
-                targetColor = Theme.AccentColor
-                break
-              end
+          local targetColor = Theme.TertiaryBg
+          for _, selected in ipairs(selectedOptions) do
+            if selected == optionText then
+              targetColor = Theme.AccentColor
+              break
             end
-            TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = targetColor}):Play()
           end
+          TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = targetColor}):Play()
         end)
       end
       
@@ -1116,13 +1132,30 @@ function Lib:Window(Info)
         CreateOption(option, i)
       end
       
-      SelectionDisplay.MouseButton1Click:Connect(function()
+      ToggleButton.MouseButton1Click:Connect(function()
         isOpen = not isOpen
-        OptionsContainer.Visible = isOpen
-        TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = isOpen and 180 or 0}):Play()
+        OptionsMenu.Visible = isOpen
+        
+        if isOpen then
+          TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 180}):Play()
+          TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.AccentColor}):Play()
+        else
+          TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
+          TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+        end
       end)
       
-      UpdateDisplay()
+      ToggleButton.MouseEnter:Connect(function()
+        if not isOpen then
+          TweenService:Create(DropdownFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+        end
+      end)
+      
+      ToggleButton.MouseLeave:Connect(function()
+        if not isOpen then
+          TweenService:Create(DropdownFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.TertiaryBg}):Play()
+        end
+      end)
       
       return {
         SetName = function(text)
@@ -1144,7 +1177,7 @@ function Lib:Window(Info)
               Font = Enum.Font.SourceSans,
               Text = text,
               LayoutOrder = 2,
-              Parent = HeaderContainer
+              Parent = TextContainer
             })
           else
             DropdownDesc.Text = text
@@ -1152,7 +1185,7 @@ function Lib:Window(Info)
         end,
         SetOptions = function(newOptions)
           Options = newOptions
-          for _, child in pairs(OptionsContainer:GetChildren()) do
+          for _, child in pairs(OptionsScroller:GetChildren()) do
             if child:IsA("TextButton") then
               child:Destroy()
             end
@@ -1169,12 +1202,11 @@ function Lib:Window(Info)
         end,
         Clear = function()
           selectedOptions = {}
-          for _, child in pairs(OptionsContainer:GetChildren()) do
+          for _, child in pairs(OptionsScroller:GetChildren()) do
             if child:IsA("TextButton") then
-              child.BackgroundColor3 = Theme.SecondaryBg
+              child.BackgroundColor3 = Theme.TertiaryBg
             end
           end
-          UpdateDisplay()
         end
       }
     end
