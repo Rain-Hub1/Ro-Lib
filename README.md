@@ -67,7 +67,7 @@ local Toggle = Tab:Toggle({
 })
 ```
 
-## `Dropdown` | Update
+## `Dropdown` | Beta | Incomplete
 ```lua
 local Dropdown = Tab:Dropdown({
   Name = "My",
