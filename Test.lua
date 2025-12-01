@@ -1037,8 +1037,18 @@ function Lib:Window(Info)
       
       local isOpen = false
       local currentCallback = Info.Callback
-      local UserInputService = game:GetService("UserInputService")
-      local inputConnection = nil
+      
+      local ClickDetector = new("TextButton", {
+        Name = "ClickDetector",
+        Size = UDim2.new(1, 0, 1, 0),
+        Position = UDim2.new(0, 0, 0, 0),
+        BackgroundTransparency = 1,
+        Text = "",
+        ZIndex = 99,
+        Visible = false,
+        Modal = false,
+        Parent = s
+      })
       
       local function TruncateText(text, maxLength)
         if #text > maxLength then
@@ -1057,24 +1067,15 @@ function Lib:Window(Info)
         if isOpen then
           isOpen = false
           OptionsMenu.Visible = false
+          ClickDetector.Visible = false
           TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
           TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
-          
-          if inputConnection then
-            inputConnection:Disconnect()
-            inputConnection = nil
-          end
         end
       end
       
-      local function IsMouseOverElement(element)
-        local mouse = UserInputService:GetMouseLocation()
-        local absPos = element.AbsolutePosition
-        local absSize = element.AbsoluteSize
-        
-        return mouse.X >= absPos.X and mouse.X <= absPos.X + absSize.X and
-               mouse.Y >= absPos.Y and mouse.Y <= absPos.Y + absSize.Y
-      end
+      ClickDetector.MouseButton1Click:Connect(function()
+        CloseMenu()
+      end)
       
       local function CreateOption(optionText, index)
         local isSelected = false
@@ -1166,18 +1167,9 @@ function Lib:Window(Info)
         if isOpen then
           UpdateMenuPosition()
           OptionsMenu.Visible = true
+          ClickDetector.Visible = true
           TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 180}):Play()
           TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.AccentColor}):Play()
-          
-          task.wait(0.1)
-          
-          inputConnection = UserInputService.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-              if not IsMouseOverElement(OptionsMenu) and not IsMouseOverElement(DropdownFrame) then
-                CloseMenu()
-              end
-            end
-          end)
         else
           CloseMenu()
         end
