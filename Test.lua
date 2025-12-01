@@ -989,13 +989,13 @@ function Lib:Window(Info)
       
       local OptionsMenu = new("Frame", {
         Name = "OptionsMenu",
-        Size = UDim2.new(1, -20, 0, 0),
-        Position = UDim2.new(0, 10, 1, 5),
+        Size = UDim2.new(0, 200, 0, 0),
+        Position = UDim2.new(1, -210, 0, 0),
         AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundColor3 = Theme.SecondaryBg,
         Visible = false,
-        ZIndex = 10,
-        Parent = DropdownFrame
+        ZIndex = 100,
+        Parent = s
       })
       
       new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = OptionsMenu })
@@ -1044,6 +1044,33 @@ function Lib:Window(Info)
         end
         return text
       end
+      
+      local function UpdateMenuPosition()
+        local absolutePos = DropdownFrame.AbsolutePosition
+        local absoluteSize = DropdownFrame.AbsoluteSize
+        OptionsMenu.Position = UDim2.new(0, absolutePos.X + absoluteSize.X - 200, 0, absolutePos.Y + absoluteSize.Y + 5)
+      end
+      
+      local function CloseMenu()
+        if isOpen then
+          isOpen = false
+          OptionsMenu.Visible = false
+          TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
+          TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+        end
+      end
+      
+      local clickDetector = new("TextButton", {
+        Name = "ClickDetector",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Text = "",
+        ZIndex = 99,
+        Visible = false,
+        Parent = s
+      })
+      
+      clickDetector.MouseButton1Click:Connect(CloseMenu)
       
       local function CreateOption(optionText, index)
         local isSelected = false
@@ -1099,10 +1126,7 @@ function Lib:Window(Info)
             end
             selectedOptions = {optionText}
             OptionButton.BackgroundColor3 = Theme.AccentColor
-            isOpen = false
-            OptionsMenu.Visible = false
-            TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
-            TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+            CloseMenu()
           end
           
           if currentCallback then
@@ -1134,12 +1158,16 @@ function Lib:Window(Info)
       
       ToggleButton.MouseButton1Click:Connect(function()
         isOpen = not isOpen
-        OptionsMenu.Visible = isOpen
         
         if isOpen then
+          UpdateMenuPosition()
+          OptionsMenu.Visible = true
+          clickDetector.Visible = true
           TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 180}):Play()
           TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.AccentColor}):Play()
         else
+          OptionsMenu.Visible = false
+          clickDetector.Visible = false
           TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
           TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
         end
