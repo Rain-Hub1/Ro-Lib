@@ -12,6 +12,19 @@ local Win = Lib:Window({
 })
 ```
 
+### `Extra` MinimizeWin
+```lua
+local MinWin = Win:MinimizeWin({
+  Format = "Circle"
+})
+
+--[[
+  Circle,
+  Square,
+  SquareBorder
+]]
+```
+
 ## `Tab`
 ```lua
 local Tab = Win:Tab({
