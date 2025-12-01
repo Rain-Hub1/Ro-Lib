@@ -725,6 +725,460 @@ function Lib:Window(Info)
       }
     end
     
+    function TabApp:Button(Info)
+      local Info = Info or {}
+      
+      local ButtonFrame = new("Frame", {
+        Name = "Button",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundColor3 = Theme.TertiaryBg,
+        Parent = TabContent
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = ButtonFrame })
+      new("UIStroke", {
+        Color = Theme.BorderColor,
+        Thickness = Theme.StrokeThickness - 1,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+        Parent = ButtonFrame
+      })
+      
+      new("UIPadding", {
+        PaddingLeft = UDim.new(0, Theme.Padding),
+        PaddingRight = UDim.new(0, Theme.Padding),
+        PaddingTop = UDim.new(0, Theme.Padding / 2),
+        PaddingBottom = UDim.new(0, Theme.Padding / 2),
+        Parent = ButtonFrame
+      })
+      
+      local TextContainer = new("Frame", {
+        Name = "TextContainer",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        Parent = ButtonFrame
+      })
+      
+      new("UIListLayout", {
+        FillDirection = Enum.FillDirection.Vertical,
+        HorizontalAlignment = Enum.HorizontalAlignment.Left,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 2),
+        Parent = TextContainer
+      })
+      
+      local ButtonName = new("TextLabel", {
+        Name = "ButtonName",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        TextColor3 = Theme.TextColor,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        TextWrapped = true,
+        TextScaled = false,
+        TextSize = 14,
+        Font = Enum.Font.SourceSansSemibold,
+        Text = Info.Name or "Button",
+        LayoutOrder = 1,
+        Parent = TextContainer
+      })
+      
+      local ButtonDesc
+      if Info.Desc and Info.Desc ~= "" then
+        ButtonDesc = new("TextLabel", {
+          Name = "ButtonDesc",
+          Size = UDim2.new(1, 0, 0, 0),
+          AutomaticSize = Enum.AutomaticSize.Y,
+          BackgroundTransparency = 1,
+          TextColor3 = Theme.TextColorDesc,
+          TextXAlignment = Enum.TextXAlignment.Left,
+          TextYAlignment = Enum.TextYAlignment.Top,
+          TextWrapped = true,
+          TextScaled = false,
+          TextSize = 12,
+          Font = Enum.Font.SourceSans,
+          Text = Info.Desc,
+          LayoutOrder = 2,
+          Parent = TextContainer
+        })
+      end
+      
+      local ButtonClick = new("TextButton", {
+        Name = "ButtonClick",
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundTransparency = 1,
+        Text = "",
+        Parent = ButtonFrame
+      })
+      
+      local currentCallback = Info.Callback
+      
+      ButtonClick.MouseButton1Click:Connect(function()
+        if currentCallback then
+          pcall(currentCallback)
+        end
+      end)
+      
+      ButtonClick.MouseEnter:Connect(function()
+        TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+      end)
+      
+      ButtonClick.MouseLeave:Connect(function()
+        TweenService:Create(ButtonFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.TertiaryBg}):Play()
+      end)
+      
+      return {
+        SetName = function(text)
+          ButtonName.Text = text
+        end,
+        SetDesc = function(text)
+          if not ButtonDesc then
+            ButtonDesc = new("TextLabel", {
+              Name = "ButtonDesc",
+              Size = UDim2.new(1, 0, 0, 0),
+              AutomaticSize = Enum.AutomaticSize.Y,
+              BackgroundTransparency = 1,
+              TextColor3 = Theme.TextColorDesc,
+              TextXAlignment = Enum.TextXAlignment.Left,
+              TextYAlignment = Enum.TextYAlignment.Top,
+              TextWrapped = true,
+              TextScaled = false,
+              TextSize = 12,
+              Font = Enum.Font.SourceSans,
+              Text = text,
+              LayoutOrder = 2,
+              Parent = TextContainer
+            })
+          else
+            ButtonDesc.Text = text
+          end
+        end,
+        SetCallback = function(callback)
+          currentCallback = callback
+        end
+      }
+    end
+    
+    function TabApp:Dropdown(Info)
+      local Info = Info or {}
+      local Options = Info.Op or {}
+      local Multi = Info.Multi or false
+      local selectedOptions = {}
+      
+      if Info.Default then
+        if Multi then
+          selectedOptions = type(Info.Default) == "table" and Info.Default or {Info.Default}
+        else
+          selectedOptions = {Info.Default}
+        end
+      end
+      
+      local DropdownFrame = new("Frame", {
+        Name = "Dropdown",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundColor3 = Theme.TertiaryBg,
+        Parent = TabContent
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = DropdownFrame })
+      new("UIStroke", {
+        Color = Theme.BorderColor,
+        Thickness = Theme.StrokeThickness - 1,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+        Parent = DropdownFrame
+      })
+      
+      new("UIPadding", {
+        PaddingLeft = UDim.new(0, Theme.Padding),
+        PaddingRight = UDim.new(0, Theme.Padding),
+        PaddingTop = UDim.new(0, Theme.Padding / 2),
+        PaddingBottom = UDim.new(0, Theme.Padding / 2),
+        Parent = DropdownFrame
+      })
+      
+      local MainContainer = new("Frame", {
+        Name = "MainContainer",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        Parent = DropdownFrame
+      })
+      
+      new("UIListLayout", {
+        FillDirection = Enum.FillDirection.Vertical,
+        HorizontalAlignment = Enum.HorizontalAlignment.Left,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 5),
+        Parent = MainContainer
+      })
+      
+      local HeaderContainer = new("Frame", {
+        Name = "HeaderContainer",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        LayoutOrder = 1,
+        Parent = MainContainer
+      })
+      
+      new("UIListLayout", {
+        FillDirection = Enum.FillDirection.Vertical,
+        HorizontalAlignment = Enum.HorizontalAlignment.Left,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 2),
+        Parent = HeaderContainer
+      })
+      
+      local DropdownName = new("TextLabel", {
+        Name = "DropdownName",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        TextColor3 = Theme.TextColor,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextYAlignment = Enum.TextYAlignment.Top,
+        TextWrapped = true,
+        TextScaled = false,
+        TextSize = 14,
+        Font = Enum.Font.SourceSansSemibold,
+        Text = Info.Name or "Dropdown",
+        LayoutOrder = 1,
+        Parent = HeaderContainer
+      })
+      
+      local DropdownDesc
+      if Info.Desc and Info.Desc ~= "" then
+        DropdownDesc = new("TextLabel", {
+          Name = "DropdownDesc",
+          Size = UDim2.new(1, 0, 0, 0),
+          AutomaticSize = Enum.AutomaticSize.Y,
+          BackgroundTransparency = 1,
+          TextColor3 = Theme.TextColorDesc,
+          TextXAlignment = Enum.TextXAlignment.Left,
+          TextYAlignment = Enum.TextYAlignment.Top,
+          TextWrapped = true,
+          TextScaled = false,
+          TextSize = 12,
+          Font = Enum.Font.SourceSans,
+          Text = Info.Desc,
+          LayoutOrder = 2,
+          Parent = HeaderContainer
+        })
+      end
+      
+      local SelectionDisplay = new("TextButton", {
+        Name = "SelectionDisplay",
+        Size = UDim2.new(1, 0, 0, 30),
+        BackgroundColor3 = Theme.SecondaryBg,
+        Text = #selectedOptions > 0 and table.concat(selectedOptions, ", ") or "Select...",
+        TextColor3 = Theme.TextColor,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextSize = 13,
+        Font = Enum.Font.SourceSans,
+        LayoutOrder = 2,
+        Parent = MainContainer
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = SelectionDisplay })
+      new("UIPadding", {
+        PaddingLeft = UDim.new(0, 8),
+        PaddingRight = UDim.new(0, 25),
+        Parent = SelectionDisplay
+      })
+      
+      local Arrow = new("TextLabel", {
+        Size = UDim2.new(0, 20, 0, 20),
+        Position = UDim2.new(1, -25, 0.5, -10),
+        BackgroundTransparency = 1,
+        Text = "▼",
+        TextColor3 = Theme.TextColor,
+        TextSize = 12,
+        Font = Enum.Font.SourceSans,
+        Parent = SelectionDisplay
+      })
+      
+      local OptionsContainer = new("Frame", {
+        Name = "OptionsContainer",
+        Size = UDim2.new(1, 0, 0, 0),
+        AutomaticSize = Enum.AutomaticSize.Y,
+        BackgroundTransparency = 1,
+        Visible = false,
+        LayoutOrder = 3,
+        Parent = MainContainer
+      })
+      
+      new("UIListLayout", {
+        FillDirection = Enum.FillDirection.Vertical,
+        HorizontalAlignment = Enum.HorizontalAlignment.Left,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 2),
+        Parent = OptionsContainer
+      })
+      
+      local isOpen = false
+      local currentCallback = Info.Callback
+      
+      local function UpdateDisplay()
+        if #selectedOptions > 0 then
+          SelectionDisplay.Text = table.concat(selectedOptions, ", ")
+        else
+          SelectionDisplay.Text = "Select..."
+        end
+      end
+      
+      local function CreateOption(optionText, index)
+        local isSelected = false
+        for _, selected in ipairs(selectedOptions) do
+          if selected == optionText then
+            isSelected = true
+            break
+          end
+        end
+        
+        local OptionButton = new("TextButton", {
+          Name = "Option_" .. index,
+          Size = UDim2.new(1, 0, 0, 28),
+          BackgroundColor3 = isSelected and Theme.AccentColor or Theme.SecondaryBg,
+          Text = optionText,
+          TextColor3 = Theme.TextColor,
+          TextXAlignment = Enum.TextXAlignment.Left,
+          TextSize = 13,
+          Font = Enum.Font.SourceSans,
+          LayoutOrder = index,
+          Parent = OptionsContainer
+        })
+        
+        new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = OptionButton })
+        new("UIPadding", {
+          PaddingLeft = UDim.new(0, 8),
+          PaddingRight = UDim.new(0, 8),
+          Parent = OptionButton
+        })
+        
+        OptionButton.MouseButton1Click:Connect(function()
+          if Multi then
+            local found = false
+            for i, selected in ipairs(selectedOptions) do
+              if selected == optionText then
+                table.remove(selectedOptions, i)
+                found = true
+                OptionButton.BackgroundColor3 = Theme.SecondaryBg
+                break
+              end
+            end
+            if not found then
+              table.insert(selectedOptions, optionText)
+              OptionButton.BackgroundColor3 = Theme.AccentColor
+            end
+          else
+            for _, child in pairs(OptionsContainer:GetChildren()) do
+              if child:IsA("TextButton") then
+                child.BackgroundColor3 = Theme.SecondaryBg
+              end
+            end
+            selectedOptions = {optionText}
+            OptionButton.BackgroundColor3 = Theme.AccentColor
+            isOpen = false
+            OptionsContainer.Visible = false
+            TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = 0}):Play()
+          end
+          
+          UpdateDisplay()
+          if currentCallback then
+            pcall(currentCallback, Multi and selectedOptions or selectedOptions[1])
+          end
+        end)
+        
+        OptionButton.MouseEnter:Connect(function()
+          if OptionButton.BackgroundColor3 ~= Theme.AccentColor then
+            TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.PrimaryBg}):Play()
+          end
+        end)
+        
+        OptionButton.MouseLeave:Connect(function()
+          if OptionButton.BackgroundColor3 ~= Theme.AccentColor then
+            local targetColor = Theme.SecondaryBg
+            for _, selected in ipairs(selectedOptions) do
+              if selected == optionText then
+                targetColor = Theme.AccentColor
+                break
+              end
+            end
+            TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = targetColor}):Play()
+          end
+        end)
+      end
+      
+      for i, option in ipairs(Options) do
+        CreateOption(option, i)
+      end
+      
+      SelectionDisplay.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        OptionsContainer.Visible = isOpen
+        TweenService:Create(Arrow, TweenInfo.new(0.2), {Rotation = isOpen and 180 or 0}):Play()
+      end)
+      
+      UpdateDisplay()
+      
+      return {
+        SetName = function(text)
+          DropdownName.Text = text
+        end,
+        SetDesc = function(text)
+          if not DropdownDesc then
+            DropdownDesc = new("TextLabel", {
+              Name = "DropdownDesc",
+              Size = UDim2.new(1, 0, 0, 0),
+              AutomaticSize = Enum.AutomaticSize.Y,
+              BackgroundTransparency = 1,
+              TextColor3 = Theme.TextColorDesc,
+              TextXAlignment = Enum.TextXAlignment.Left,
+              TextYAlignment = Enum.TextYAlignment.Top,
+              TextWrapped = true,
+              TextScaled = false,
+              TextSize = 12,
+              Font = Enum.Font.SourceSans,
+              Text = text,
+              LayoutOrder = 2,
+              Parent = HeaderContainer
+            })
+          else
+            DropdownDesc.Text = text
+          end
+        end,
+        SetOptions = function(newOptions)
+          Options = newOptions
+          for _, child in pairs(OptionsContainer:GetChildren()) do
+            if child:IsA("TextButton") then
+              child:Destroy()
+            end
+          end
+          for i, option in ipairs(Options) do
+            CreateOption(option, i)
+          end
+        end,
+        SetCallback = function(callback)
+          currentCallback = callback
+        end,
+        Get = function()
+          return Multi and selectedOptions or selectedOptions[1]
+        end,
+        Clear = function()
+          selectedOptions = {}
+          for _, child in pairs(OptionsContainer:GetChildren()) do
+            if child:IsA("TextButton") then
+              child.BackgroundColor3 = Theme.SecondaryBg
+            end
+          end
+          UpdateDisplay()
+        end
+      }
+    end
+    
     if #TabScroller:GetChildren() == 1 then
         TabApp:SelectTab()
     end
