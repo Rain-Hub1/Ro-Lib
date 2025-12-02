@@ -989,9 +989,8 @@ function Lib:Window(Info)
       
       local OptionsMenu = new("Frame", {
         Name = "OptionsMenu",
-        Size = UDim2.new(0, 200, 0, 0),
-        Position = UDim2.new(1, -210, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
+        Size = UDim2.new(0, 220, 0, 0),
+        Position = UDim2.new(1, -230, 0, 0),
         BackgroundColor3 = Theme.SecondaryBg,
         Visible = false,
         ZIndex = 100,
@@ -1006,16 +1005,68 @@ function Lib:Window(Info)
         Parent = OptionsMenu
       })
       
+      local MenuLayout = new("UIListLayout", {
+        FillDirection = Enum.FillDirection.Vertical,
+        HorizontalAlignment = Enum.HorizontalAlignment.Left,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 5),
+        Parent = OptionsMenu
+      })
+      
+      new("UIPadding", {
+        PaddingLeft = UDim.new(0, 5),
+        PaddingRight = UDim.new(0, 5),
+        PaddingTop = UDim.new(0, 5),
+        PaddingBottom = UDim.new(0, 5),
+        Parent = OptionsMenu
+      })
+      
+      local SearchContainer = new("Frame", {
+        Name = "SearchContainer",
+        Size = UDim2.new(1, 0, 0, 30),
+        BackgroundColor3 = Theme.TertiaryBg,
+        LayoutOrder = 1,
+        Parent = OptionsMenu
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = SearchContainer })
+      
+      local SearchBox = new("TextBox", {
+        Name = "SearchBox",
+        Size = UDim2.new(1, -35, 1, 0),
+        Position = UDim2.new(0, 5, 0, 0),
+        BackgroundTransparency = 1,
+        TextColor3 = Theme.TextColor,
+        PlaceholderText = "Search...",
+        PlaceholderColor3 = Theme.TextColorDesc,
+        Text = "",
+        TextXAlignment = Enum.TextXAlignment.Left,
+        TextSize = 13,
+        Font = Enum.Font.SourceSans,
+        ClearTextOnFocus = false,
+        Parent = SearchContainer
+      })
+      
+      local SearchIcon = new("ImageLabel", {
+        Name = "SearchIcon",
+        Size = UDim2.new(0, 20, 0, 20),
+        Position = UDim2.new(1, -25, 0.5, -10),
+        BackgroundTransparency = 1,
+        Image = "rbxassetid://10734943674",
+        ImageColor3 = Theme.TextColorDesc,
+        Parent = SearchContainer
+      })
+      
       local OptionsScroller = new("ScrollingFrame", {
         Name = "OptionsScroller",
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
+        Size = UDim2.new(1, 0, 0, 150),
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ScrollBarThickness = 4,
         CanvasSize = UDim2.new(0, 0, 0, 0),
         AutomaticCanvasSize = Enum.AutomaticSize.Y,
         ScrollBarImageColor3 = Theme.AccentColor,
+        LayoutOrder = 2,
         Parent = OptionsMenu
       })
       
@@ -1028,15 +1079,16 @@ function Lib:Window(Info)
       })
       
       new("UIPadding", {
-        PaddingLeft = UDim.new(0, 5),
-        PaddingRight = UDim.new(0, 5),
-        PaddingTop = UDim.new(0, 5),
-        PaddingBottom = UDim.new(0, 5),
+        PaddingLeft = UDim.new(0, 0),
+        PaddingRight = UDim.new(0, 0),
+        PaddingTop = UDim.new(0, 2),
+        PaddingBottom = UDim.new(0, 2),
         Parent = OptionsScroller
       })
       
       local isOpen = false
       local currentCallback = Info.Callback
+      local isDragging = false
       
       local ClickDetector = new("TextButton", {
         Name = "ClickDetector",
@@ -1060,21 +1112,89 @@ function Lib:Window(Info)
       local function UpdateMenuPosition()
         local absolutePos = DropdownFrame.AbsolutePosition
         local absoluteSize = DropdownFrame.AbsoluteSize
-        OptionsMenu.Position = UDim2.new(0, absolutePos.X + absoluteSize.X - 200, 0, absolutePos.Y + absoluteSize.Y + 5)
+        local screenSize = s.AbsoluteSize
+        
+        local menuWidth = 220
+        local menuHeight = math.min(MenuLayout.AbsoluteContentSize.Y + 10, 250)
+        OptionsMenu.Size = UDim2.new(0, menuWidth, 0, menuHeight)
+        
+        local scrollerHeight = menuHeight - 45
+        OptionsScroller.Size = UDim2.new(1, 0, 0, scrollerHeight)
+        
+        local posX = absolutePos.X + absoluteSize.X - menuWidth
+        local posY = absolutePos.Y + absoluteSize.Y + 5
+        
+        if posX + menuWidth > screenSize.X then
+          posX = screenSize.X - menuWidth - 10
+        end
+        
+        if posX < 10 then
+          posX = 10
+        end
+        
+        if posY + menuHeight > screenSize.Y then
+          posY = absolutePos.Y - menuHeight - 5
+        end
+        
+        if posY < 10 then
+          posY = 10
+        end
+        
+        OptionsMenu.Position = UDim2.new(0, posX, 0, posY)
       end
       
       local function CloseMenu()
-        if isOpen then
+        if isOpen and not isDragging then
           isOpen = false
           OptionsMenu.Visible = false
           ClickDetector.Visible = false
+          SearchBox.Text = ""
           TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
           TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+          
+          for _, child in pairs(OptionsScroller:GetChildren()) do
+            if child:IsA("TextButton") then
+              child.Visible = true
+            end
+          end
         end
       end
       
       ClickDetector.MouseButton1Click:Connect(function()
         CloseMenu()
+      end)
+      
+      Win.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+          isDragging = true
+        end
+      end)
+      
+      Win.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+          isDragging = false
+          if isOpen then
+            CloseMenu()
+          end
+        end
+      end)
+      
+      local function FilterOptions(searchText)
+        searchText = searchText:lower()
+        for _, child in pairs(OptionsScroller:GetChildren()) do
+          if child:IsA("TextButton") then
+            local optionText = child.Text:lower()
+            if searchText == "" or optionText:find(searchText, 1, true) then
+              child.Visible = true
+            else
+              child.Visible = false
+            end
+          end
+        end
+      end
+      
+      SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        FilterOptions(SearchBox.Text)
       end)
       
       local function CreateOption(optionText, index)
@@ -1086,7 +1206,7 @@ function Lib:Window(Info)
           end
         end
         
-        local displayText = TruncateText(optionText, 25)
+        local displayText = TruncateText(optionText, 28)
         
         local OptionButton = new("TextButton", {
           Name = "Option_" .. index,
@@ -1142,6 +1262,106 @@ function Lib:Window(Info)
         OptionButton.MouseEnter:Connect(function()
           if OptionButton.BackgroundColor3 ~= Theme.AccentColor then
             TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+          end
+        end)
+        
+        OptionButton.MouseLeave:Connect(function()
+          local targetColor = Theme.TertiaryBg
+          for _, selected in ipairs(selectedOptions) do
+            if selected == optionText then
+              targetColor = Theme.AccentColor
+              break
+            end
+          end
+          TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = targetColor}):Play()
+        end)
+      end
+      
+      for i, option in ipairs(Options) do
+        CreateOption(option, i)
+      end
+      
+      ToggleButton.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        
+        if isOpen then
+          UpdateMenuPosition()
+          OptionsMenu.Visible = true
+          ClickDetector.Visible = true
+          TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 180}):Play()
+          TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.AccentColor}):Play()
+          task.wait()
+          SearchBox:CaptureFocus()
+        else
+          CloseMenu()
+        end
+      end)
+      
+      ToggleButton.MouseEnter:Connect(function()
+        if not isOpen then
+          TweenService:Create(DropdownFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+        end
+      end)
+      
+      ToggleButton.MouseLeave:Connect(function()
+        if not isOpen then
+          TweenService:Create(DropdownFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.TertiaryBg}):Play()
+        end
+      end)
+      
+      return {
+        SetName = function(text)
+          DropdownName.Text = text
+        end,
+        SetDesc = function(text)
+          if not DropdownDesc then
+            DropdownDesc = new("TextLabel", {
+              Name = "DropdownDesc",
+              Size = UDim2.new(1, 0, 0, 0),
+              AutomaticSize = Enum.AutomaticSize.Y,
+              BackgroundTransparency = 1,
+              TextColor3 = Theme.TextColorDesc,
+              TextXAlignment = Enum.TextXAlignment.Left,
+              TextYAlignment = Enum.TextYAlignment.Top,
+              TextWrapped = true,
+              TextScaled = false,
+              TextSize = 12,
+              Font = Enum.Font.SourceSans,
+              Text = text,
+              LayoutOrder = 2,
+              Parent = TextContainer
+            })
+          else
+            DropdownDesc.Text = text
+          end
+        end,
+        SetOptions = function(newOptions)
+          Options = newOptions
+          for _, child in pairs(OptionsScroller:GetChildren()) do
+            if child:IsA("TextButton") then
+              child:Destroy()
+            end
+          end
+          for i, option in ipairs(Options) do
+            CreateOption(option, i)
+          end
+        end,
+        SetCallback = function(callback)
+          currentCallback = callback
+        end,
+        Get = function()
+          return Multi and selectedOptions or selectedOptions[1]
+        end,
+        Clear = function()
+          selectedOptions = {}
+          for _, child in pairs(OptionsScroller:GetChildren()) do
+            if child:IsA("TextButton") then
+              child.BackgroundColor3 = Theme.TertiaryBg
+            end
+          end
+        end
+      }
+    endTweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
           end
         end)
         
