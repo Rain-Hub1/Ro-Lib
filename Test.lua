@@ -1361,6 +1361,107 @@ function Lib:Window(Info)
           end
         end
       }
+    end
+            TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+          end
+        end)
+        
+        OptionButton.MouseLeave:Connect(function()
+          local targetColor = Theme.TertiaryBg
+          for _, selected in ipairs(selectedOptions) do
+            if selected == optionText then
+              targetColor = Theme.AccentColor
+              break
+            end
+          end
+          TweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = targetColor}):Play()
+        end)
+      end
+      
+      for i, option in ipairs(Options) do
+        CreateOption(option, i)
+      end
+      
+      ToggleButton.MouseButton1Click:Connect(function()
+        isOpen = not isOpen
+        
+        if isOpen then
+          UpdateMenuPosition()
+          OptionsMenu.Visible = true
+          ClickDetector.Visible = true
+          TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 180}):Play()
+          TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.AccentColor}):Play()
+          task.wait()
+          SearchBox:CaptureFocus()
+        else
+          CloseMenu()
+        end
+      end)
+      
+      ToggleButton.MouseEnter:Connect(function()
+        if not isOpen then
+          TweenService:Create(DropdownFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
+        end
+      end)
+      
+      ToggleButton.MouseLeave:Connect(function()
+        if not isOpen then
+          TweenService:Create(DropdownFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.TertiaryBg}):Play()
+        end
+      end)
+      
+      return {
+        SetName = function(text)
+          DropdownName.Text = text
+        end,
+        SetDesc = function(text)
+          if not DropdownDesc then
+            DropdownDesc = new("TextLabel", {
+              Name = "DropdownDesc",
+              Size = UDim2.new(1, 0, 0, 0),
+              AutomaticSize = Enum.AutomaticSize.Y,
+              BackgroundTransparency = 1,
+              TextColor3 = Theme.TextColorDesc,
+              TextXAlignment = Enum.TextXAlignment.Left,
+              TextYAlignment = Enum.TextYAlignment.Top,
+              TextWrapped = true,
+              TextScaled = false,
+              TextSize = 12,
+              Font = Enum.Font.SourceSans,
+              Text = text,
+              LayoutOrder = 2,
+              Parent = TextContainer
+            })
+          else
+            DropdownDesc.Text = text
+          end
+        end,
+        SetOptions = function(newOptions)
+          Options = newOptions
+          for _, child in pairs(OptionsScroller:GetChildren()) do
+            if child:IsA("TextButton") then
+              child:Destroy()
+            end
+          end
+          for i, option in ipairs(Options) do
+            CreateOption(option, i)
+          end
+        end,
+        SetCallback = function(callback)
+          currentCallback = callback
+        end,
+        Get = function()
+          return Multi and selectedOptions or selectedOptions[1]
+        end,
+        Clear = function()
+          selectedOptions = {}
+          for _, child in pairs(OptionsScroller:GetChildren()) do
+            if child:IsA("TextButton") then
+              child.BackgroundColor3 = Theme.TertiaryBg
+            end
+          end
+        end
+      }
     endTweenService:Create(OptionButton, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
           end
         end)
