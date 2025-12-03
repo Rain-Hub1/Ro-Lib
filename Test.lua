@@ -621,7 +621,7 @@ function Lib:Window(Info)
       
       local SwitchContainer = new("Frame", {
         Name = "SwitchContainer",
-        Size = UDim2.new(0, 44, 0, 23),
+        Size = UDim2.new(0, 36, 0, 20),
         Position = UDim2.new(1, 8, 0.5, -0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = toggled and Color3.fromRGB(46, 204, 113) or Color3.fromRGB(35, 35, 35),
@@ -638,8 +638,8 @@ function Lib:Window(Info)
       
       local SwitchCircle = new("Frame", {
         Name = "SwitchCircle",
-        Size = UDim2.new(0, 18, 0, 18),
-        Position = toggled and UDim2.new(1, -21, 0.5, -0) or UDim2.new(0, 3, 0.5, -0),
+        Size = UDim2.new(0, 14, 0, 14),
+        Position = toggled and UDim2.new(1, -17, 0.5, -0) or UDim2.new(0, 3, 0.5, -0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         Parent = SwitchContainer
@@ -664,7 +664,7 @@ function Lib:Window(Info)
         
         if toggled then
           TweenService:Create(SwitchContainer, tweenInfo, {BackgroundColor3 = Color3.fromRGB(46, 204, 113)}):Play()
-          TweenService:Create(SwitchCircle, tweenInfo, {Position = UDim2.new(1, -21, 0.5, -0)}):Play()
+          TweenService:Create(SwitchCircle, tweenInfo, {Position = UDim2.new(1, -17, 0.5, -0)}):Play()
         else
           TweenService:Create(SwitchContainer, tweenInfo, {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
           TweenService:Create(SwitchCircle, tweenInfo, {Position = UDim2.new(0, 3, 0.5, -0)}):Play()
@@ -1224,9 +1224,29 @@ function Lib:Window(Info)
         new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = OptionButton })
         new("UIPadding", {
           PaddingLeft = UDim.new(0, 8),
-          PaddingRight = UDim.new(0, 8),
+          PaddingRight = UDim.new(0, 30),
           Parent = OptionButton
         })
+        
+        local CheckMark = new("TextLabel", {
+          Name = "CheckMark",
+          Size = UDim2.new(0, 20, 0, 20),
+          Position = UDim2.new(1, -25, 0.5, -10),
+          BackgroundTransparency = 1,
+          Text = "✓",
+          TextColor3 = Color3.fromRGB(255, 255, 255),
+          TextSize = 16,
+          Font = Enum.Font.SourceSansBold,
+          Visible = isSelected,
+          TextTransparency = isSelected and 0 or 1,
+          Parent = OptionButton
+        })
+        
+        if isSelected then
+          CheckMark.Size = UDim2.new(0, 20, 0, 20)
+        else
+          CheckMark.Size = UDim2.new(0, 0, 0, 0)
+        end
         
         OptionButton.MouseButton1Click:Connect(function()
           if Multi then
@@ -1236,21 +1256,51 @@ function Lib:Window(Info)
                 table.remove(selectedOptions, i)
                 found = true
                 OptionButton.BackgroundColor3 = Theme.TertiaryBg
+                TweenService:Create(CheckMark, TweenInfo.new(0.2), {
+                  Size = UDim2.new(0, 0, 0, 0),
+                  TextTransparency = 1
+                }):Play()
+                task.wait(0.2)
+                CheckMark.Visible = false
                 break
               end
             end
             if not found then
               table.insert(selectedOptions, optionText)
               OptionButton.BackgroundColor3 = Theme.AccentColor
+              CheckMark.Visible = true
+              CheckMark.Size = UDim2.new(0, 0, 0, 0)
+              CheckMark.TextTransparency = 1
+              TweenService:Create(CheckMark, TweenInfo.new(0.2), {
+                Size = UDim2.new(0, 20, 0, 20),
+                TextTransparency = 0
+              }):Play()
             end
           else
             for _, child in pairs(OptionsScroller:GetChildren()) do
               if child:IsA("TextButton") then
                 child.BackgroundColor3 = Theme.TertiaryBg
+                local mark = child:FindFirstChild("CheckMark")
+                if mark then
+                  TweenService:Create(mark, TweenInfo.new(0.2), {
+                    Size = UDim2.new(0, 0, 0, 0),
+                    TextTransparency = 1
+                  }):Play()
+                  task.wait(0.2)
+                  mark.Visible = false
+                end
               end
             end
             selectedOptions = {optionText}
             OptionButton.BackgroundColor3 = Theme.AccentColor
+            CheckMark.Visible = true
+            CheckMark.Size = UDim2.new(0, 0, 0, 0)
+            CheckMark.TextTransparency = 1
+            TweenService:Create(CheckMark, TweenInfo.new(0.2), {
+              Size = UDim2.new(0, 20, 0, 20),
+              TextTransparency = 0
+            }):Play()
+            task.wait(0.2)
             CloseMenu()
           end
           
