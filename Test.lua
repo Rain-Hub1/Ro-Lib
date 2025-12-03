@@ -1098,7 +1098,7 @@ function Lib:Window(Info)
                 local children = OptionsScroller:GetChildren()
                 local visibleChildren = 0
                 for _, child in pairs(children) do
-                    if child:IsA("TextButton") or child:IsA("Frame") then
+                    if child:IsA("TextButton") or child:IsA("TextLabel") or child:IsA("Frame") then
                         totalHeight = totalHeight + child.Size.Y.Offset
                         visibleChildren = visibleChildren + 1
                     end
@@ -1437,7 +1437,7 @@ function Lib:Window(Info)
                 })
                 
                 new("UICorner", {
-                  CornerRadius = UDim.new(0, 6),
+                  CornerRadius = Theme.CornerRadius,
                   Parent = CloseButton
                 })
                 
@@ -1496,7 +1496,10 @@ function Lib:Window(Info)
                 
                 game:GetService("UserInputService").InputChanged:Connect(function(input)
                   if isPicking and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-                    UpdateColor(input)
+                    local xPos = input.Position.X - colorWheel.AbsolutePosition.X
+                    local yPos = input.Position.Y - colorWheel.AbsolutePosition.Y
+                    
+                    UpdateColor({Position = Vector2.new(xPos + colorWheel.AbsolutePosition.X, yPos + colorWheel.AbsolutePosition.Y)})
                   end
                 end)
                 
@@ -1618,11 +1621,12 @@ function Lib:Window(Info)
     end,
   }
   
-  if #TabScroller:GetChildren() == 1 then
-      TabApp:SelectTab()
-  end
+  -- Lógica de seleção automática removida para evitar erro 'nil index', pois 'TabApp'
+  -- é local à função 'AddTab' e só existe se o usuário a chamou.
+  -- O usuário deve selecionar a primeira aba manualmente.
   
   return WinApp
 end
 
 return Lib
+
