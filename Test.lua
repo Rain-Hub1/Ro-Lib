@@ -559,7 +559,7 @@ function Lib:Window(Info)
       
       new("UIPadding", {
         PaddingLeft = UDim.new(0, Theme.Padding),
-        PaddingRight = UDim.new(0, Theme.Padding + 50),
+        PaddingRight = UDim.new(0, Theme.Padding + 40),
         PaddingTop = UDim.new(0, Theme.Padding / 2),
         PaddingBottom = UDim.new(0, Theme.Padding / 2),
         Parent = ToggleFrame
