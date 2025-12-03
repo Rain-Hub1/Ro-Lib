@@ -1592,7 +1592,7 @@ function Lib:Window(Info)
                   NameLabel.Text = newName
                 end,
                 SetDescription = function(newDesc)
-                  -- No visible description for ColorPicker
+                  
                 end,
                 SetCallback = function(newCallback)
                   currentCallback = newCallback
@@ -1620,11 +1620,8 @@ function Lib:Window(Info)
       return TabApp
     end,
   }
-  
-  -- Lógica de seleção automática removida para evitar erro 'nil index', pois 'TabApp'
-  -- é local à função 'AddTab' e só existe se o usuário a chamou.
-  -- O usuário deve selecionar a primeira aba manualmente.
-  
+
+  -- É nois stalker mistérioso 👍
   return WinApp
 end
 
