@@ -1,5 +1,6 @@
 local Lib = {}
 
+-- Opa stalker mistérioso, qual seu nome e ip? so pra saber mesmo nada pessoal
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
@@ -530,235 +531,6 @@ function Lib:Window(Info)
       new("UIPadding", {
         PaddingLeft = UDim.new(0, Theme.Padding),
         PaddingRight = UDim.new(0, Theme.Padding),
-        PaddingTop = UDim.new(0, Theme.Padding / 2),
-        PaddingBottom = UDim.new(0, Theme.Padding / 2),
-        Parent = SliderFrame
-      })
-      
-      local TextContainer = new("Frame", {
-        Name = "TextContainer",
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        BackgroundTransparency = 1,
-        Parent = SliderFrame
-      })
-      
-      new("UIListLayout", {
-        FillDirection = Enum.FillDirection.Vertical,
-        HorizontalAlignment = Enum.HorizontalAlignment.Left,
-        SortOrder = Enum.SortOrder.LayoutOrder,
-        Padding = UDim.new(0, 4),
-        Parent = TextContainer
-      })
-      
-      local SliderName = new("TextLabel", {
-        Name = "SliderName",
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        BackgroundTransparency = 1,
-        TextColor3 = Theme.TextColor,
-        TextXAlignment = Enum.TextXAlignment.Left,
-        TextYAlignment = Enum.TextYAlignment.Top,
-        TextWrapped = true,
-        TextScaled = false,
-        TextSize = 14,
-        Font = Enum.Font.SourceSansSemibold,
-        Text = Info.Name or "Slider",
-        LayoutOrder = 1,
-        Parent = TextContainer
-      })
-      
-      local SliderDesc
-      if Info.Desc and Info.Desc ~= "" then
-        SliderDesc = new("TextLabel", {
-          Name = "SliderDesc",
-          Size = UDim2.new(1, 0, 0, 0),
-          AutomaticSize = Enum.AutomaticSize.Y,
-          BackgroundTransparency = 1,
-          TextColor3 = Theme.TextColorDesc,
-          TextXAlignment = Enum.TextXAlignment.Left,
-          TextYAlignment = Enum.TextYAlignment.Top,
-          TextWrapped = true,
-          TextScaled = false,
-          TextSize = 12,
-          Font = Enum.Font.SourceSans,
-          Text = Info.Desc,
-          LayoutOrder = 2,
-          Parent = TextContainer
-        })
-      end
-      
-      local SliderContainer = new("Frame", {
-        Name = "SliderContainer",
-        Size = UDim2.new(1, 0, 0, 30),
-        BackgroundTransparency = 1,
-        LayoutOrder = 3,
-        Parent = TextContainer
-      })
-      
-      local SliderBar = new("Frame", {
-        Name = "SliderBar",
-        Size = UDim2.new(1, -60, 0, 6),
-        Position = UDim2.new(0, 0, 0.5, -3),
-        BackgroundColor3 = Theme.SecondaryBg,
-        Parent = SliderContainer
-      })
-      
-      new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderBar })
-      
-      local SliderFill = new("Frame", {
-        Name = "SliderFill",
-        Size = UDim2.new((currentValue - minValue) / (maxValue - minValue), 0, 1, 0),
-        BackgroundColor3 = Theme.AccentColor,
-        Parent = SliderBar
-      })
-      
-      new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderFill })
-      
-      local SliderKnob = new("Frame", {
-        Name = "SliderKnob",
-        Size = UDim2.new(0, 16, 0, 16),
-        Position = UDim2.new((currentValue - minValue) / (maxValue - minValue), -8, 0.5, -8),
-        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-        Parent = SliderBar
-      })
-      
-      new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderKnob })
-      new("UIStroke", {
-        Color = Theme.AccentColor,
-        Thickness = 2,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-        Parent = SliderKnob
-      })
-      
-      local ValueLabel = new("TextLabel", {
-        Name = "ValueLabel",
-        Size = UDim2.new(0, 50, 1, 0),
-        Position = UDim2.new(1, -50, 0, 0),
-        BackgroundTransparency = 1,
-        TextColor3 = Theme.TextColor,
-        TextXAlignment = Enum.TextXAlignment.Right,
-        TextSize = 13,
-        Font = Enum.Font.SourceSansSemibold,
-        Text = tostring(currentValue),
-        Parent = SliderContainer
-      })
-      
-      local draggingSlider = false
-      local currentCallback = Info.Callback
-      
-      local function UpdateSlider(input)
-        local barPos = SliderBar.AbsolutePosition.X
-        local barSize = SliderBar.AbsoluteSize.X
-        local mousePos = input.Position.X
-        
-        local percent = math.clamp((mousePos - barPos) / barSize, 0, 1)
-        currentValue = math.floor(minValue + (maxValue - minValue) * percent)
-        
-        SliderFill.Size = UDim2.new(percent, 0, 1, 0)
-        SliderKnob.Position = UDim2.new(percent, -8, 0.5, -8)
-        ValueLabel.Text = tostring(currentValue)
-        
-        if currentCallback then
-          pcall(currentCallback, currentValue)
-        end
-      end
-      
-      SliderBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-          draggingSlider = true
-          UpdateSlider(input)
-          
-          input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-              draggingSlider = false
-            end
-          end)
-        end
-      end)
-      
-      game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if draggingSlider and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-          UpdateSlider(input)
-        end
-      end)
-      
-      SliderFrame.MouseEnter:Connect(function()
-        TweenService:Create(SliderFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
-      end)
-      
-      SliderFrame.MouseLeave:Connect(function()
-        TweenService:Create(SliderFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.TertiaryBg}):Play()
-      end)
-      
-      return {
-        SetName = function(text)
-          SliderName.Text = text
-        end,
-        SetDesc = function(text)
-          if not SliderDesc then
-            SliderDesc = new("TextLabel", {
-              Name = "SliderDesc",
-              Size = UDim2.new(1, 0, 0, 0),
-              AutomaticSize = Enum.AutomaticSize.Y,
-              BackgroundTransparency = 1,
-              TextColor3 = Theme.TextColorDesc,
-              TextXAlignment = Enum.TextXAlignment.Left,
-              TextYAlignment = Enum.TextYAlignment.Top,
-              TextWrapped = true,
-              TextScaled = false,
-              TextSize = 12,
-              Font = Enum.Font.SourceSans,
-              Text = text,
-              LayoutOrder = 2,
-              Parent = TextContainer
-            })
-          else
-            SliderDesc.Text = text
-          end
-        end,
-        SetDefault = function(value)
-          currentValue = math.clamp(value, minValue, maxValue)
-          local percent = (currentValue - minValue) / (maxValue - minValue)
-          SliderFill.Size = UDim2.new(percent, 0, 1, 0)
-          SliderKnob.Position = UDim2.new(percent, -8, 0.5, -8)
-          ValueLabel.Text = tostring(currentValue)
-        end,
-        SetMinV = function(value)
-          minValue = value
-          currentValue = math.clamp(currentValue, minValue, maxValue)
-          local percent = (currentValue - minValue) / (maxValue - minValue)
-          SliderFill.Size = UDim2.new(percent, 0, 1, 0)
-          SliderKnob.Position = UDim2.new(percent, -8, 0.5, -8)
-          ValueLabel.Text = tostring(currentValue)
-        end,
-        SetMaxV = function(value)
-          maxValue = value
-          currentValue = math.clamp(currentValue, minValue, maxValue)
-          local percent = (currentValue - minValue) / (maxValue - minValue)
-          SliderFill.Size = UDim2.new(percent, 0, 1, 0)
-          SliderKnob.Position = UDim2.new(percent, -8, 0.5, -8)
-          ValueLabel.Text = tostring(currentValue)
-        end,
-        SetCallback = function(callback)
-          currentCallback = callback
-        end,
-        Get = function()
-          return currentValue
-        end
-      }
-    end
-    
-    if #TabScroller:GetChildren() == 1 then
-        TabApp:SelectTab()
-    end
-    
-    return TabApp
-  end
-  return WinApp
-end
-
-return Lib0, Theme.Padding),
         PaddingTop = UDim.new(0, Theme.Padding / 2),
         PaddingBottom = UDim.new(0, Theme.Padding / 2),        
         Parent = Title
@@ -1573,41 +1345,8 @@ return Lib0, Theme.Padding),
       end)
       
       return {
-        AddOp = function(newOptions)
-          for _, option in ipairs(newOptions) do
-            table.insert(Options, option)
-            CreateOption(option, #Options)
-          end
-        end,
         SetName = function(text)
           DropdownName.Text = text
-        end,
-        SetDefault = function(defaults)
-          if Multi then
-            selectedOptions = type(defaults) == "table" and defaults or {defaults}
-          else
-            selectedOptions = type(defaults) == "table" and defaults or {defaults}
-          end
-          for _, child in pairs(OptionsScroller:GetChildren()) do
-            if child:IsA("TextButton") then
-              local label = child:FindFirstChild("OptionLabel")
-              if label then
-                local isSelected = false
-                for _, selected in ipairs(selectedOptions) do
-                  if label.Text:find(selected, 1, true) then
-                    isSelected = true
-                    break
-                  end
-                end
-                child.BackgroundColor3 = isSelected and Theme.AccentColor or Theme.TertiaryBg
-                local checkMark = child:FindFirstChild("CheckMark")
-                if checkMark then
-                  checkMark.Visible = isSelected
-                  checkMark.Size = isSelected and UDim2.new(0, 16, 0, 16) or UDim2.new(0, 0, 0, 0)
-                end
-              end
-            end
-          end
         end,
         SetDesc = function(text)
           if not DropdownDesc then
@@ -1630,9 +1369,6 @@ return Lib0, Theme.Padding),
           else
             DropdownDesc.Text = text
           end
-        end,
-        SetMulti = function(value)
-          Multi = value
         end,
         SetOptions = function(newOptions)
           Options = newOptions
@@ -1667,28 +1403,13 @@ return Lib0, Theme.Padding),
       }
     end
     
-    function TabApp:Slider(Info)
-      local Info = Info or {}
-      local minValue = Info.MinV or 0
-      local maxValue = Info.MaxV or 100
-      local currentValue = Info.Default or minValue
-      
-      local SliderFrame = new("Frame", {
-        Name = "Slider",
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
-        BackgroundColor3 = Theme.TertiaryBg,
-        Parent = TabContent
-      })
-      
-      new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = SliderFrame })
-      new("UIStroke", {
-        Color = Theme.BorderColor,
-        Thickness = Theme.StrokeThickness - 1,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-        Parent = SliderFrame
-      })
-      
-      new("UIPadding", {
-        PaddingLeft = UDim.new(0, Theme.Padding),
-        PaddingRight = UDim.new(
+    if #TabScroller:GetChildren() == 1 then
+        TabApp:SelectTab()
+    end
+    
+    return TabApp
+  end
+  return WinApp
+end
+
+return Lib
