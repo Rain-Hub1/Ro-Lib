@@ -67,7 +67,7 @@ local Toggle = Tab:Toggle({
 })
 ```
 
-## `Dropdown` | Beta | Incomplete
+## `Dropdown`
 ```lua
 local Dropdown = Tab:Dropdown({
   Name = "My",
@@ -75,6 +75,20 @@ local Dropdown = Tab:Dropdown({
   Op = {"Options", "Multi!"},
   Default = "Options",
   Multi = true,
+  Callback = function(v)
+    print("Value: " .. v)
+  end
+})
+```
+
+## `Slider` | Beta | Incomplete
+```lua
+local Slider = Tab:Slider({
+  Name = "My",
+  Desc = "Slider!",
+  Default = 1,
+  MinV = 1,
+  MaxV = 10,
   Callback = function(v)
     print("Value: " .. v)
   end
@@ -133,6 +147,17 @@ local Dropdown = Tab:Dropdown({
   Op = {"Options", "Multi!"},
   Default = "Options",
   Multi = true,
+  Callback = function(v)
+    print("Value: " .. v)
+  end
+})
+
+local Slider = Tab:Slider({
+  Name = "My",
+  Desc = "Slider!",
+  Default = 1,
+  MinV = 1,
+  MaxV = 10,
   Callback = function(v)
     print("Value: " .. v)
   end
