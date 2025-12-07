@@ -4,8 +4,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 
--- é nois seu stalker mistérioso 👍
-
 local function new(className, properties)
   local instance = Instance.new(className)
   for prop, value in pairs(properties or {}) do
@@ -418,7 +416,8 @@ function Lib:Window(Info)
 
     local Tab = new("TextButton", {
       Name = Info.Name or "Tab",
-      Size = UDim2.new(1, -Theme.Padding, 0, 30), 
+      Size = UDim2.new(1, -Theme.Padding, 0, 0), 
+      AutomaticSize = Enum.AutomaticSize.Y,
       BackgroundColor3 = Theme.PrimaryBg,
       Text = Info.Name or "Tab",
       TextXAlignment = Enum.TextXAlignment.Left,
@@ -442,8 +441,8 @@ function Lib:Window(Info)
     new("UIPadding", {
       PaddingLeft = UDim.new(0, Theme.Padding),
       PaddingRight = UDim.new(0, Theme.Padding),
-      PaddingTop = UDim.new(0, 4),
-      PaddingBottom = UDim.new(0, 4),
+      PaddingTop = UDim.new(0, 6),
+      PaddingBottom = UDim.new(0, 6),
       Parent = Tab
     })
 
@@ -561,7 +560,7 @@ function Lib:Window(Info)
       
       new("UIPadding", {
         PaddingLeft = UDim.new(0, Theme.Padding),
-        PaddingRight = UDim.new(0, Theme.Padding + 50),
+        PaddingRight = UDim.new(0, Theme.Padding + 40),
         PaddingTop = UDim.new(0, Theme.Padding / 2),
         PaddingBottom = UDim.new(0, Theme.Padding / 2),
         Parent = ToggleFrame
@@ -623,8 +622,8 @@ function Lib:Window(Info)
       
       local SwitchContainer = new("Frame", {
         Name = "SwitchContainer",
-        Size = UDim2.new(0, 44, 0, 23),
-        Position = UDim2.new(1, 8, 0.5, -0),
+        Size = UDim2.new(0, 36, 0, 18),
+        Position = UDim2.new(1, 6, 0.5, -0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = toggled and Color3.fromRGB(46, 204, 113) or Color3.fromRGB(35, 35, 35),
         Parent = ToggleFrame
@@ -640,8 +639,8 @@ function Lib:Window(Info)
       
       local SwitchCircle = new("Frame", {
         Name = "SwitchCircle",
-        Size = UDim2.new(0, 18, 0, 18),
-        Position = toggled and UDim2.new(1, -21, 0.5, -0) or UDim2.new(0, 3, 0.5, -0),
+        Size = UDim2.new(0, 14, 0, 14),
+        Position = toggled and UDim2.new(1, -16, 0.5, -0) or UDim2.new(0, 2, 0.5, -0),
         AnchorPoint = Vector2.new(0, 0.5),
         BackgroundColor3 = Color3.fromRGB(255, 255, 255),
         Parent = SwitchContainer
@@ -666,10 +665,10 @@ function Lib:Window(Info)
         
         if toggled then
           TweenService:Create(SwitchContainer, tweenInfo, {BackgroundColor3 = Color3.fromRGB(46, 204, 113)}):Play()
-          TweenService:Create(SwitchCircle, tweenInfo, {Position = UDim2.new(1, -21, 0.5, -0)}):Play()
+          TweenService:Create(SwitchCircle, tweenInfo, {Position = UDim2.new(1, -16, 0.5, -0)}):Play()
         else
           TweenService:Create(SwitchContainer, tweenInfo, {BackgroundColor3 = Color3.fromRGB(35, 35, 35)}):Play()
-          TweenService:Create(SwitchCircle, tweenInfo, {Position = UDim2.new(0, 3, 0.5, -0)}):Play()
+          TweenService:Create(SwitchCircle, tweenInfo, {Position = UDim2.new(0, 2, 0.5, -0)}):Play()
         end
         
         if currentCallback then
@@ -993,7 +992,6 @@ function Lib:Window(Info)
         Name = "OptionsMenu",
         Size = UDim2.new(0, 200, 0, 0),
         Position = UDim2.new(1, -210, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
         BackgroundColor3 = Theme.SecondaryBg,
         Visible = false,
         ZIndex = 100,
@@ -1008,10 +1006,59 @@ function Lib:Window(Info)
         Parent = OptionsMenu
       })
       
+      new("UISizeConstraint", {
+        MaxSize = Vector2.new(200, 250),
+        Parent = OptionsMenu
+      })
+      
+      local MenuHeader = new("Frame", {
+        Name = "MenuHeader",
+        Size = UDim2.new(1, 0, 0, 35),
+        BackgroundColor3 = Theme.TertiaryBg,
+        Parent = OptionsMenu
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = MenuHeader })
+      
+      local SearchBox = new("TextBox", {
+        Name = "SearchBox",
+        Size = UDim2.new(1, -45, 0, 25),
+        Position = UDim2.new(0, 8, 0, 5),
+        BackgroundColor3 = Theme.SecondaryBg,
+        TextColor3 = Theme.TextColor,
+        PlaceholderText = "Search...",
+        PlaceholderColor3 = Theme.TextColorDesc,
+        Text = "",
+        TextSize = 13,
+        Font = Enum.Font.SourceSans,
+        TextXAlignment = Enum.TextXAlignment.Left,
+        ClearTextOnFocus = false,
+        Parent = MenuHeader
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = SearchBox })
+      new("UIPadding", {
+        PaddingLeft = UDim.new(0, 8),
+        PaddingRight = UDim.new(0, 8),
+        Parent = SearchBox
+      })
+      
+      local SearchButton = new("ImageButton", {
+        Name = "SearchButton",
+        Size = UDim2.new(0, 25, 0, 25),
+        Position = UDim2.new(1, -33, 0, 5),
+        BackgroundColor3 = Theme.AccentColor,
+        Image = "rbxassetid://10734943674",
+        ImageColor3 = Theme.TextColor,
+        Parent = MenuHeader
+      })
+      
+      new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = SearchButton })
+      
       local OptionsScroller = new("ScrollingFrame", {
         Name = "OptionsScroller",
-        Size = UDim2.new(1, 0, 0, 0),
-        AutomaticSize = Enum.AutomaticSize.Y,
+        Size = UDim2.new(1, 0, 1, -35),
+        Position = UDim2.new(0, 0, 0, 35),
         BackgroundTransparency = 1,
         BorderSizePixel = 0,
         ScrollBarThickness = 4,
@@ -1039,6 +1086,9 @@ function Lib:Window(Info)
       
       local isOpen = false
       local currentCallback = Info.Callback
+      local draggingMenu = false
+      local menuDragStart = nil
+      local menuStartPos = nil
       
       local ClickDetector = new("TextButton", {
         Name = "ClickDetector",
@@ -1052,6 +1102,33 @@ function Lib:Window(Info)
         Parent = s
       })
       
+      MenuHeader.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+          draggingMenu = true
+          menuDragStart = input.Position
+          menuStartPos = OptionsMenu.Position
+          
+          input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+              draggingMenu = false
+            end
+          end)
+        end
+      end)
+      
+      game:GetService("UserInputService").InputChanged:Connect(function(input)
+        if draggingMenu and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+          local delta = input.Position - menuDragStart
+          local newPos = UDim2.new(
+            menuStartPos.X.Scale,
+            menuStartPos.X.Offset + delta.X,
+            menuStartPos.Y.Scale,
+            menuStartPos.Y.Offset + delta.Y
+          )
+          OptionsMenu.Position = newPos
+        end
+      end)
+      
       local function TruncateText(text, maxLength)
         if #text > maxLength then
           return string.sub(text, 1, maxLength) .. "..."
@@ -1060,14 +1137,39 @@ function Lib:Window(Info)
       end
       
       local function UpdateMenuPosition()
+        local screenSize = s.AbsoluteSize
         local absolutePos = DropdownFrame.AbsolutePosition
         local absoluteSize = DropdownFrame.AbsoluteSize
-        OptionsMenu.Position = UDim2.new(0, absolutePos.X + absoluteSize.X - 200, 0, absolutePos.Y + absoluteSize.Y + 5)
+        local menuWidth = 200
+        local menuHeight = math.min(250, 35 + (#Options * 30) + 20)
+        
+        local posX = absolutePos.X + absoluteSize.X - menuWidth
+        local posY = absolutePos.Y + absoluteSize.Y + 5
+        
+        if posX + menuWidth > screenSize.X then
+          posX = screenSize.X - menuWidth - 10
+        end
+        if posX < 10 then
+          posX = 10
+        end
+        
+        if posY + menuHeight > screenSize.Y then
+          posY = absolutePos.Y - menuHeight - 5
+        end
+        if posY < 10 then
+          posY = 10
+        end
+        
+        OptionsMenu.Position = UDim2.new(0, posX, 0, posY)
       end
       
       local function CloseMenu()
         if isOpen then
           isOpen = false
+          TweenService:Create(OptionsMenu, TweenInfo.new(0.2), {
+            Size = UDim2.new(0, 200, 0, 0)
+          }):Play()
+          task.wait(0.2)
           OptionsMenu.Visible = false
           ClickDetector.Visible = false
           TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
@@ -1076,7 +1178,9 @@ function Lib:Window(Info)
       end
       
       ClickDetector.MouseButton1Click:Connect(function()
-        CloseMenu()
+        if not draggingMenu then
+          CloseMenu()
+        end
       end)
       
       local function CreateOption(optionText, index)
@@ -1088,27 +1192,49 @@ function Lib:Window(Info)
           end
         end
         
-        local displayText = TruncateText(optionText, 25)
+        local displayText = TruncateText(optionText, 22)
         
         local OptionButton = new("TextButton", {
           Name = "Option_" .. index,
           Size = UDim2.new(1, 0, 0, 28),
           BackgroundColor3 = isSelected and Theme.AccentColor or Theme.TertiaryBg,
-          Text = displayText,
-          TextColor3 = Theme.TextColor,
-          TextXAlignment = Enum.TextXAlignment.Left,
-          TextSize = 13,
-          Font = Enum.Font.SourceSans,
+          Text = "",
           LayoutOrder = index,
           Parent = OptionsScroller
         })
         
         new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = OptionButton })
-        new("UIPadding", {
-          PaddingLeft = UDim.new(0, 8),
-          PaddingRight = UDim.new(0, 8),
+        
+        local OptionLabel = new("TextLabel", {
+          Name = "OptionLabel",
+          Size = UDim2.new(1, -25, 1, 0),
+          Position = UDim2.new(0, 8, 0, 0),
+          BackgroundTransparency = 1,
+          Text = displayText,
+          TextColor3 = Theme.TextColor,
+          TextXAlignment = Enum.TextXAlignment.Left,
+          TextSize = 13,
+          Font = Enum.Font.SourceSans,
           Parent = OptionButton
         })
+        
+        local CheckMark = new("TextLabel", {
+          Name = "CheckMark",
+          Size = UDim2.new(0, 0, 0, 0),
+          Position = UDim2.new(1, -20, 0.5, 0),
+          AnchorPoint = Vector2.new(0, 0.5),
+          BackgroundTransparency = 1,
+          Text = "✓",
+          TextColor3 = Color3.fromRGB(255, 255, 255),
+          TextSize = 16,
+          Font = Enum.Font.SourceSansBold,
+          Visible = isSelected,
+          Parent = OptionButton
+        })
+        
+        if isSelected then
+          CheckMark.Size = UDim2.new(0, 16, 0, 16)
+        end
         
         OptionButton.MouseButton1Click:Connect(function()
           if Multi then
@@ -1118,21 +1244,32 @@ function Lib:Window(Info)
                 table.remove(selectedOptions, i)
                 found = true
                 OptionButton.BackgroundColor3 = Theme.TertiaryBg
+                CheckMark.Visible = false
+                TweenService:Create(CheckMark, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 0, 0)}):Play()
                 break
               end
             end
             if not found then
               table.insert(selectedOptions, optionText)
               OptionButton.BackgroundColor3 = Theme.AccentColor
+              CheckMark.Visible = true
+              TweenService:Create(CheckMark, TweenInfo.new(0.2), {Size = UDim2.new(0, 16, 0, 16)}):Play()
             end
           else
             for _, child in pairs(OptionsScroller:GetChildren()) do
               if child:IsA("TextButton") then
                 child.BackgroundColor3 = Theme.TertiaryBg
+                local oldCheck = child:FindFirstChild("CheckMark")
+                if oldCheck then
+                  oldCheck.Visible = false
+                  TweenService:Create(oldCheck, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 0, 0)}):Play()
+                end
               end
             end
             selectedOptions = {optionText}
             OptionButton.BackgroundColor3 = Theme.AccentColor
+            CheckMark.Visible = true
+            TweenService:Create(CheckMark, TweenInfo.new(0.2), {Size = UDim2.new(0, 16, 0, 16)}):Play()
             CloseMenu()
           end
           
@@ -1163,6 +1300,19 @@ function Lib:Window(Info)
         CreateOption(option, i)
       end
       
+      SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
+        local searchText = SearchBox.Text:lower()
+        for _, child in pairs(OptionsScroller:GetChildren()) do
+          if child:IsA("TextButton") then
+            local label = child:FindFirstChild("OptionLabel")
+            if label then
+              local optionText = label.Text:lower()
+              child.Visible = searchText == "" or optionText:find(searchText, 1, true) ~= nil
+            end
+          end
+        end
+      end)
+      
       ToggleButton.MouseButton1Click:Connect(function()
         isOpen = not isOpen
         
@@ -1170,6 +1320,10 @@ function Lib:Window(Info)
           UpdateMenuPosition()
           OptionsMenu.Visible = true
           ClickDetector.Visible = true
+          local targetHeight = math.min(250, 35 + (#Options * 30) + 20)
+          TweenService:Create(OptionsMenu, TweenInfo.new(0.2), {
+            Size = UDim2.new(0, 200, 0, targetHeight)
+          }):Play()
           TweenService:Create(ArrowIcon, TweenInfo.new(0.2), {Rotation = 180}):Play()
           TweenService:Create(DropdownButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.AccentColor}):Play()
         else
@@ -1237,6 +1391,11 @@ function Lib:Window(Info)
           for _, child in pairs(OptionsScroller:GetChildren()) do
             if child:IsA("TextButton") then
               child.BackgroundColor3 = Theme.TertiaryBg
+              local checkMark = child:FindFirstChild("CheckMark")
+              if checkMark then
+                checkMark.Visible = false
+                TweenService:Create(checkMark, TweenInfo.new(0.2), {Size = UDim2.new(0, 0, 0, 0)}):Play()
+              end
             end
           end
         end
