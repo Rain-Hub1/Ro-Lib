@@ -1523,7 +1523,7 @@ function Lib:Window(Info)
       
       local SliderContainer = new("Frame", {
         Name = "SliderContainer",
-        Size = UDim2.new(1, 0, 0, 30),
+        Size = UDim2.new(1, 0, 0, 25),
         BackgroundTransparency = 1,
         LayoutOrder = 3,
         Parent = TextContainer
@@ -1532,7 +1532,7 @@ function Lib:Window(Info)
       local InputBox = new("TextBox", {
         Name = "InputBox",
         Size = UDim2.new(0, 50, 0, 25),
-        Position = UDim2.new(0, 0, 0.5, -12.5),
+        Position = UDim2.new(0, 0, 0, 0),
         BackgroundColor3 = Theme.SecondaryBg,
         TextColor3 = Theme.TextColor,
         Text = tostring(currentValue),
@@ -1553,7 +1553,7 @@ function Lib:Window(Info)
       
       local SliderBar = new("Frame", {
         Name = "SliderBar",
-        Size = UDim2.new(1, -65, 0, 6),
+        Size = UDim2.new(1, -60, 0, 6),
         Position = UDim2.new(0, 60, 0.5, -3),
         BackgroundColor3 = Theme.SecondaryBg,
         Parent = SliderContainer
