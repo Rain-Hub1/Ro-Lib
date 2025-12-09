@@ -1462,7 +1462,7 @@ function Lib:Window(Info)
       
       new("UIPadding", {
         PaddingLeft = UDim.new(0, Theme.Padding),
-        PaddingRight = UDim.new(0, Theme.Padding + 50),
+        PaddingRight = UDim.new(0, Theme.Padding),
         PaddingTop = UDim.new(0, Theme.Padding / 2),
         PaddingBottom = UDim.new(0, Theme.Padding / 2),
         Parent = SliderFrame
@@ -1521,118 +1521,42 @@ function Lib:Window(Info)
         })
       end
       
-      local SliderButton = new("Frame", {
-        Name = "SliderButton",
-        Size = UDim2.new(0, 44, 0, 23),
-        Position = UDim2.new(1, 8, 0.5, 0),
-        AnchorPoint = Vector2.new(0, 0.5),
-        BackgroundColor3 = Theme.SecondaryBg,
-        Parent = SliderFrame
-      })
-      
-      new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderButton })
-      new("UIStroke", {
-        Color = Theme.BorderColor,
-        Thickness = 1,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-        Parent = SliderButton
-      })
-      
-      local SliderIcon = new("ImageLabel", {
-        Name = "SliderIcon",
-        Size = UDim2.new(0, 16, 0, 16),
-        Position = UDim2.new(0.5, -8, 0.5, -8),
+      local SliderContainer = new("Frame", {
+        Name = "SliderContainer",
+        Size = UDim2.new(1, 0, 0, 30),
         BackgroundTransparency = 1,
-        Image = "rbxassetid://10734950309",
-        ImageColor3 = Theme.TextColor,
-        Parent = SliderButton
+        LayoutOrder = 3,
+        Parent = TextContainer
       })
-      
-      local SliderToggleButton = new("TextButton", {
-        Name = "SliderToggleButton",
-        Size = UDim2.new(1, 0, 1, 0),
-        BackgroundTransparency = 1,
-        Text = "",
-        Parent = SliderFrame
-      })
-      
-      local SliderMenu = new("Frame", {
-        Name = "SliderMenu",
-        Size = UDim2.new(0, 200, 0, 0),
-        Position = UDim2.new(1, -210, 0, 0),
-        BackgroundColor3 = Theme.SecondaryBg,
-        Visible = false,
-        ZIndex = 100,
-        Parent = s
-      })
-      
-      new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = SliderMenu })
-      new("UIStroke", {
-        Color = Theme.BorderColor,
-        Thickness = Theme.StrokeThickness,
-        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
-        Parent = SliderMenu
-      })
-      
-      new("UISizeConstraint", {
-        MaxSize = Vector2.new(200, 150),
-        Parent = SliderMenu
-      })
-      
-      local MenuHeader = new("Frame", {
-        Name = "MenuHeader",
-        Size = UDim2.new(1, 0, 0, 35),
-        BackgroundColor3 = Theme.TertiaryBg,
-        Parent = SliderMenu
-      })
-      
-      new("UICorner", { CornerRadius = UDim.new(0, 6), Parent = MenuHeader })
       
       local InputBox = new("TextBox", {
         Name = "InputBox",
-        Size = UDim2.new(1, -16, 0, 25),
-        Position = UDim2.new(0, 8, 0, 5),
+        Size = UDim2.new(0, 50, 0, 25),
+        Position = UDim2.new(0, 0, 0.5, -12.5),
         BackgroundColor3 = Theme.SecondaryBg,
         TextColor3 = Theme.TextColor,
-        PlaceholderText = "Enter value...",
-        PlaceholderColor3 = Theme.TextColorDesc,
         Text = tostring(currentValue),
         TextSize = 13,
         Font = Enum.Font.SourceSans,
         TextXAlignment = Enum.TextXAlignment.Center,
         ClearTextOnFocus = false,
-        Parent = MenuHeader
+        Parent = SliderContainer
       })
       
       new("UICorner", { CornerRadius = UDim.new(0, 4), Parent = InputBox })
-      new("UIPadding", {
-        PaddingLeft = UDim.new(0, 8),
-        PaddingRight = UDim.new(0, 8),
+      new("UIStroke", {
+        Color = Theme.BorderColor,
+        Thickness = 1,
+        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
         Parent = InputBox
-      })
-      
-      local SliderMenuContent = new("Frame", {
-        Name = "SliderMenuContent",
-        Size = UDim2.new(1, 0, 1, -35),
-        Position = UDim2.new(0, 0, 0, 35),
-        BackgroundTransparency = 1,
-        Parent = SliderMenu
-      })
-      
-      new("UIPadding", {
-        PaddingLeft = UDim.new(0, 10),
-        PaddingRight = UDim.new(0, 10),
-        PaddingTop = UDim.new(0, 10),
-        PaddingBottom = UDim.new(0, 10),
-        Parent = SliderMenuContent
       })
       
       local SliderBar = new("Frame", {
         Name = "SliderBar",
-        Size = UDim2.new(1, 0, 0, 6),
-        Position = UDim2.new(0, 0, 0.5, -3),
+        Size = UDim2.new(1, -65, 0, 6),
+        Position = UDim2.new(0, 60, 0.5, -3),
         BackgroundColor3 = Theme.SecondaryBg,
-        Parent = SliderMenuContent
+        Parent = SliderContainer
       })
       
       new("UICorner", { CornerRadius = UDim.new(1, 0), Parent = SliderBar })
@@ -1662,98 +1586,8 @@ function Lib:Window(Info)
         Parent = SliderKnob
       })
       
-      local isOpen = false
-      local currentCallback = Info.Callback
       local draggingSlider = false
-      local draggingMenu = false
-      local menuDragStart = nil
-      local menuStartPos = nil
-      
-      local ClickDetector = new("TextButton", {
-        Name = "ClickDetector",
-        Size = UDim2.new(1, 0, 1, 0),
-        Position = UDim2.new(0, 0, 0, 0),
-        BackgroundTransparency = 1,
-        Text = "",
-        ZIndex = 99,
-        Visible = false,
-        Modal = false,
-        Parent = s
-      })
-      
-      MenuHeader.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
-          draggingMenu = true
-          menuDragStart = input.Position
-          menuStartPos = SliderMenu.Position
-          
-          input.Changed:Connect(function()
-            if input.UserInputState == Enum.UserInputState.End then
-              draggingMenu = false
-            end
-          end)
-        end
-      end)
-      
-      game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if draggingMenu and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
-          local delta = input.Position - menuDragStart
-          local newPos = UDim2.new(
-            menuStartPos.X.Scale,
-            menuStartPos.X.Offset + delta.X,
-            menuStartPos.Y.Scale,
-            menuStartPos.Y.Offset + delta.Y
-          )
-          SliderMenu.Position = newPos
-        end
-      end)
-      
-      local function UpdateMenuPosition()
-        local screenSize = s.AbsoluteSize
-        local absolutePos = SliderFrame.AbsolutePosition
-        local absoluteSize = SliderFrame.AbsoluteSize
-        local menuWidth = 200
-        local menuHeight = 150
-        
-        local posX = absolutePos.X + absoluteSize.X - menuWidth
-        local posY = absolutePos.Y + absoluteSize.Y + 5
-        
-        if posX + menuWidth > screenSize.X then
-          posX = screenSize.X - menuWidth - 10
-        end
-        if posX < 10 then
-          posX = 10
-        end
-        
-        if posY + menuHeight > screenSize.Y then
-          posY = absolutePos.Y - menuHeight - 5
-        end
-        if posY < 10 then
-          posY = 10
-        end
-        
-        SliderMenu.Position = UDim2.new(0, posX, 0, posY)
-      end
-      
-      local function CloseMenu()
-        if isOpen then
-          isOpen = false
-          TweenService:Create(SliderMenu, TweenInfo.new(0.2), {
-            Size = UDim2.new(0, 200, 0, 0)
-          }):Play()
-          task.wait(0.2)
-          SliderMenu.Visible = false
-          ClickDetector.Visible = false
-          TweenService:Create(SliderIcon, TweenInfo.new(0.2), {Rotation = 0}):Play()
-          TweenService:Create(SliderButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.SecondaryBg}):Play()
-        end
-      end
-      
-      ClickDetector.MouseButton1Click:Connect(function()
-        if not draggingMenu then
-          CloseMenu()
-        end
-      end)
+      local currentCallback = Info.Callback
       
       local function UpdateValue(value)
         currentValue = math.clamp(value, minValue, maxValue)
@@ -1805,33 +1639,12 @@ function Lib:Window(Info)
         end
       end)
       
-      SliderToggleButton.MouseButton1Click:Connect(function()
-        isOpen = not isOpen
-        
-        if isOpen then
-          UpdateMenuPosition()
-          SliderMenu.Visible = true
-          ClickDetector.Visible = true
-          TweenService:Create(SliderMenu, TweenInfo.new(0.2), {
-            Size = UDim2.new(0, 200, 0, 150)
-          }):Play()
-          TweenService:Create(SliderIcon, TweenInfo.new(0.2), {Rotation = 180}):Play()
-          TweenService:Create(SliderButton, TweenInfo.new(0.2), {BackgroundColor3 = Theme.AccentColor}):Play()
-        else
-          CloseMenu()
-        end
+      SliderFrame.MouseEnter:Connect(function()
+        TweenService:Create(SliderFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
       end)
       
-      SliderToggleButton.MouseEnter:Connect(function()
-        if not isOpen then
-          TweenService:Create(SliderFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.SecondaryBg}):Play()
-        end
-      end)
-      
-      SliderToggleButton.MouseLeave:Connect(function()
-        if not isOpen then
-          TweenService:Create(SliderFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.TertiaryBg}):Play()
-        end
+      SliderFrame.MouseLeave:Connect(function()
+        TweenService:Create(SliderFrame, TweenInfo.new(0.1), {BackgroundColor3 = Theme.TertiaryBg}):Play()
       end)
       
       return {
